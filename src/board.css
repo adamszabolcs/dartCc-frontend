@@ -1,0 +1,93 @@
+* {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                     supported by Chrome and Opera */
+}
+
+.board,
+.table {
+    float: left;
+}
+
+.board {
+    width: 500px;
+}
+
+.table {
+    width: calc(100% - 500px);
+}
+
+.board svg {
+    height: 500px;
+    width: 500px;
+
+}
+
+.table table {
+    border-collapse: collapse;
+    float: left;
+    margin: 0 0.5%;
+    text-align: center;
+    width: 49%;
+}
+
+.break {
+    background: black;
+}
+
+
+#dartboard #areas g path:hover,
+#dartboard #areas g circle:hover {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+#dartboard {
+    background: #32383e;
+    border-radius: 60%;
+}
+
+body {
+    background-color: black;
+    color: white;
+}
+
+a{
+    color: white !important;
+}
+
+a.dropdown-item {
+    color: black !important;
+}
+
+#darts-logo {
+    max-height: 40px;
+    padding: 0;
+}
+
+.board-row {
+    margin-top: 2%;
+}
+
+.modal {
+    color: black;
+}
+
+@media (min-width: 992px){
+    .navbar li {
+        margin-left : 1em;
+        margin-right : 1em;
+    }
+}
+
+.table-dark {
+    margin-top: 5%;
+}
+/*.navbar-dark .navbar-toggler-icon {*/
+    /*background-image: url("data:image/svg+xml;..");*/
+/*}*/
