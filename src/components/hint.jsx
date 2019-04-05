@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 
 class Hint extends Component {
+
     render() {
         return (
-            <section id="help">
+            <section className="resume-section d-flex" id="help" style={{padding: "5rem"}}>
                 <div>
-                    <h2>About the game</h2>
+                    <h1 style={{color: "#e33717"}}>About the game</h1>
                     <div>
+                        <br/>
                         <p>This is the simplest of games. Each player starts with a score of 301 and takes turns to
                             throw 3 darts. The score for each turn is calculated and
                             deducted from the players total. Bullseye scores 50, the outer ring scores 25 and a dart in
