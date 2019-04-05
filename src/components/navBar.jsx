@@ -35,7 +35,7 @@ class NavBar extends Component {
     render() {
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
-                <a className="navbar-brand js-scroll-trigger" href="#page-top">
+                <a className="navbar-brand js-scroll-trigger" href="#board">
                     <span className="d-block d-lg-none">
                         <img className="mx-auto mb-3"
                              src={whitedart}
