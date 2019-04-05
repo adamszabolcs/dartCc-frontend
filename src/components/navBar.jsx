@@ -1,17 +1,39 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css'
+import whitedart from '../whitedart.png';
 
 
 class NavBar extends Component {
+
+    componentDidMount() {
+        let mainNavLinks = document.getElementsByClassName("nav-link");
+        for (let i = 0; i < mainNavLinks.length; i++) {
+            let currentNav = mainNavLinks[i];
+            mainNavLinks[i].addEventListener('click', function() {
+                let current = document.getElementsByClassName("active");
+                current[0].className = current[0].className.replace(" active", "");
+                currentNav.className += " active";
+            })
+        }
+
+    };
+
     render() {
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
                 <a className="navbar-brand js-scroll-trigger" href="#page-top">
-                    <span className="d-block d-lg-none">DartCc</span>
+                    <span className="d-block d-lg-none">
+                        <img className="mx-auto mb-3"
+                             src={whitedart}
+                             height="30px"
+                             width="30px"
+                             alt=""/></span>
                     <span className="d-none d-lg-block">
-                        <img className="img-fluid img-profile rounded-circle mx-auto mb-2"
-                             src="../../public/whitedart.png"
+                        <img className="mx-auto mb-3"
+                             src={whitedart}
+                             height="30px"
+                             width="30px"
                              alt=""/>
                     </span>
                 </a>
@@ -23,7 +45,7 @@ class NavBar extends Component {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <a className="nav-link js-scroll-trigger" href="#letsplay">Let's play!</a>
+                            <a className="nav-link js-scroll-trigger active" href="#letsplay">Let's play!</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link js-scroll-trigger" href="#board">Board</a>
