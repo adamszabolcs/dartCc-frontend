@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css'
 import whitedart from '../whitedart.png';
+import $ from 'jquery';
 
 
 class NavBar extends Component {
@@ -16,6 +17,18 @@ class NavBar extends Component {
                 currentNav.className += " active";
             })
         }
+
+        $(window).scroll(function() {
+            var scrollDistance = $(window).scrollTop();
+
+            // Assign active class to nav links while scolling
+            $('.resume-section').each(function(i) {
+                if ($(this).position().top <= scrollDistance) {
+                    $('.nav-item a.active').removeClass('active');
+                    $('.nav-item a').eq(i).addClass('active');
+                }
+            });
+        }).scroll();
 
     };
 
