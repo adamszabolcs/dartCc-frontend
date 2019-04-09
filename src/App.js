@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import DartBoard from './components/dartBoard';
 import NavBar from './components/navBar';
 import Hint from './components/hint';
 import Input from './components/input';
+import $ from 'jquery';
 
 class App extends Component {
 
@@ -63,15 +64,22 @@ class App extends Component {
         }
     };
 
+    toggleNavbar() {
+        $(document.body).animate({"padding": 0});
+        $('#sideNav').animate({"width":0});
+        document.getElementById("sideNav").className += " hidden";
+    }
+
 
     render() {
         return (
             <div className="App">
                 <NavBar/>
                 <Input
-                    playerOne = {this.state.playerOne}
-                    playerTwo = {this.state.playerTwo}
-                    getPlayerName = {this.getPlayerName}
+                    playerOne={this.state.playerOne}
+                    playerTwo={this.state.playerTwo}
+                    getPlayerName={this.getPlayerName}
+                    toggleNavbar={this.toggleNavbar}
                 />
                 <DartBoard/>
                 <Hint/>
