@@ -20,9 +20,9 @@ class NavBar extends Component {
         for (let i = 0; i < mainNavLinks.length; i++) {
             let currentNav = mainNavLinks[i];
             mainNavLinks[i].addEventListener('click', function () {
-                let current = document.getElementsByClassName("active");
-                current[0].className = current[0].className.replace(" active", "");
-                currentNav.className += " active";
+                let current = document.getElementsByClassName("isactive");
+                current[0].className = current[0].className.replace(" isactive", "");
+                currentNav.className += " isactive";
             })
         }
 
@@ -32,8 +32,8 @@ class NavBar extends Component {
             // Assign active class to nav links while scolling
             $('.resume-section').each(function (i) {
                 if ($(this).position().top <= scrollDistance) {
-                    $('.nav-item a.active').removeClass('active');
-                    $('.nav-item a').eq(i).addClass('active');
+                    $('.nav-item a.isactive').removeClass('isactive');
+                    $('.nav-item a').eq(i).addClass('isactive');
                 }
             });
         }).scroll();
@@ -74,10 +74,11 @@ class NavBar extends Component {
                         aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
+
                 <div className={`${classOne}`} id="navbarSupportedContent">
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <a className="nav-link js-scroll-trigger active" href="#letsplay">Let's play!</a>
+                            <a className="nav-link js-scroll-trigger isactive" href="#letsplay">Let's play!</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link js-scroll-trigger" href="#board">Board</a>
