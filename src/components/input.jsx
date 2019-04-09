@@ -19,7 +19,6 @@ class Input extends Component {
             },
             body: players,
         })
-            .then(console.log("sent to backend!"));
     };
 
     render() {
@@ -28,13 +27,19 @@ class Input extends Component {
                 <div className="text-center">
                     <h1>LET'S PLAY!</h1>
                     <form method="post">
-                        <input type="text" name="player1name" value={this.props.playerOne.name}
+                        <input className="form-control"
+                               type="text" name="player1name" value={this.props.playerOne.name}
                                placeholder="Player 1 name"
                                onChange={this.props.getPlayerName}/>
-                        <input type="text" name="player2name" value={this.props.playerTwo.name}
+                        <br/>
+                        <input className="form-control"
+                               type="text" name="player2name" value={this.props.playerTwo.name}
                                placeholder="Player 2 name"
                                onChange={this.props.getPlayerName}/>
-                        <button type="submit" onClick={this.createGame}><a href="#board"> Let's play!</a></button>
+                               <br/>
+                        <button className="btn btn-primary"
+                                type="submit" onClick={this.createGame}><a href="#board"> Let's
+                            play!</a></button>
                     </form>
                 </div>
             </section>
