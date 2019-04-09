@@ -23,17 +23,17 @@ class Input extends Component {
 
     render() {
         return (
-            <section className="resume-section d-flex" id="letsplay">
+            <section className="resume-section d-flex" id="letsplay" style={{padding: "5rem"}}>
                 <div className="text-center">
                     <h1>LET'S PLAY!</h1>
                     <form method="post">
                         <input className="form-control"
-                               type="text" name="player1name" value={this.props.playerOne.name}
+                               type="text" name="p1name" value={this.props.playerOne.name}
                                placeholder="Player 1 name"
                                onChange={this.props.getPlayerName}/>
                         <br/>
                         <input className="form-control"
-                               type="text" name="player2name" value={this.props.playerTwo.name}
+                               type="text" name="p2name" value={this.props.playerTwo.name}
                                placeholder="Player 2 name"
                                onChange={this.props.getPlayerName}/>
                                <br/>
