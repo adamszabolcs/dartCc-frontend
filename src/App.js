@@ -15,6 +15,8 @@ class App extends Component {
                 doubles: 0,
                 triples: 0,
                 round: 1,
+                playerOneScore: 301,
+                playerTwoScore: 301,
                 turnCounter: 0,
                 actualPlayer: "p1",
                 winner: null,
@@ -46,20 +48,18 @@ class App extends Component {
 
     getPlayerName = e => {
         e.preventDefault();
-        if (e.target.name === "player1name") {
+        if (e.target.name === "p1name") {
             this.setState({
                 playerOne: {
                     name: e.target.value,
                 }
             });
-            console.log(this.state.playerOne.name);
         } else {
             this.setState({
                 playerTwo: {
                     name: e.target.value,
                 }
             });
-            console.log("player2: " + this.state.playerTwo.name);
         }
     };
 
