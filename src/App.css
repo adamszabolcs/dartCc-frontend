@@ -1,6 +1,5 @@
 .App {
-  text-align: center;
-  background-color: black;
+  background-color: #282828;
 }
 
 .App-logo {
@@ -35,4 +34,8 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif !important;
 }

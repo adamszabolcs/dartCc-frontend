@@ -88,6 +88,14 @@ a.dropdown-item {
 .table-dark {
     margin-top: 5%;
 }
+
+.fontchange {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.outbutton {
+    background-color: #fac20c;
+}
 /*.navbar-dark .navbar-toggler-icon {*/
     /*background-image: url("data:image/svg+xml;..");*/
 /*}*/

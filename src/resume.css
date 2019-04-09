@@ -97,7 +97,8 @@ p.lead {
 
 @media (min-width: 992px) {
   #sideNav {
-    text-align: center;
+    /*text-align: center;*/
+    font-family: 'Montserrat', sans-serif;
     position: fixed;
     top: 0;
     left: 0;
@@ -110,7 +111,6 @@ p.lead {
     flex-direction: column;
     width: 17rem;
     height: 100vh;
-    box-shadow: 5px 0 20px 10px #8c3834 !important
   }
   #sideNav .navbar-brand {
     display: -webkit-box;
@@ -179,7 +179,7 @@ section.resume-section .resume-item .resume-date {
 }
 
 .bg-primary {
-  background-color: #ed4138 !important;
+  background-color: #e33717 !important;
 }
 
 .text-primary {
@@ -190,6 +190,22 @@ a {
   color: #BD5D38;
 }
 
-a:hover, a:focus, a:active {
-  color: #824027;
+li a:hover, a:focus, a.current {
+  color: #a22008 !important;
+}
+
+li a:hover::after {
+  content: '';
+  position: absolute;
+  left: 11%;
+  margin-left: -5px;
+  height: 0;
+  width: 0;
+  border-bottom: 10px solid transparent;
+  border-top: 10px solid transparent;
+  border-left: 10px solid #a22008;
+}
+
+.active {
+  color: #a22008 !important;
 }
