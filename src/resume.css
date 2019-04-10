@@ -194,18 +194,24 @@ li a:hover, a:focus, a.current {
   color: #a22008 !important;
 }
 
-li a:hover::after {
-  content: '';
-  position: absolute;
-  left: 11%;
-  margin-left: -5px;
-  height: 0;
-  width: 0;
-  border-bottom: 10px solid transparent;
-  border-top: 10px solid transparent;
-  border-left: 10px solid #a22008;
+@media (min-width: 992px) {
+  li a:hover::after {
+    content: '';
+    position: absolute;
+    left: 11%;
+    margin-left: -5px;
+    height: 0;
+    width: 0;
+    border-bottom: 10px solid transparent;
+    border-top: 10px solid transparent;
+    border-left: 10px solid #a22008;
+  }
 }
 
-.active {
+.isactive {
   color: #a22008 !important;
+}
+
+.hidden {
+  display: none !important;
 }
