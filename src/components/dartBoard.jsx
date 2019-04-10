@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css';
 import '../board.css';
+import hamburger from '../hmenu.png';
 
 class DartBoard extends Component {
 
@@ -62,10 +63,24 @@ class DartBoard extends Component {
         this.sendTurnInformation(score);
     }
 
+    openMenuButton() {
+        if (localStorage.getItem("gameId")) {
+            return (
+                <img src={hamburger} alt="Open menu"
+                     onClick={this.props.toggleNavbarBack}
+                     style={{cursor: "pointer"}}/>
+            )
+        }
+    }
+
 
     render() {
+        const openMenu = this.openMenuButton();
         return (
             <section className="resume-section p-3 p-lg-5 d-flex" id="board">
+                <div className="left-top">
+                    {openMenu}
+                </div>
                 <div className="board container-fluid p-0 text-center">
                     <svg id="dartboard"
                          version="1.1" x="0px" y="0px" width="787px" height="774px" viewBox="0 0 787 774"
