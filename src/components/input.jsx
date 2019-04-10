@@ -26,9 +26,10 @@ class Input extends Component {
 
     render() {
         return (
-            <section className="resume-section d-flex" id="letsplay" style={{padding: "5rem"}}>
+            <section className="resume-section d-flex justify-content-center" id="letsplay" style={{padding: "5rem"}}>
                 <div className="text-center">
-                    <h1>LET'S PLAY!</h1>
+                    <h1 style={{color: "#e33717"}}>LET'S PLAY!</h1>
+                    <br/>
                     <form>
                         <input className="form-control"
                                type="text" name="p1name" value={this.props.playerOne.name}
@@ -40,8 +41,7 @@ class Input extends Component {
                                placeholder="Player 2 name"
                                onChange={this.props.getPlayerName}/>
                         <br/>
-                        <a className="btn btn-primary" onClick={this.createGame} href="#board"> Let's
-                            play!</a>
+                        <a className="btn playbutton fontchange" onClick={this.createGame} href="#board"> LET'S PLAY!</a>
                     </form>
                 </div>
             </section>
