@@ -12,6 +12,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            collapsed: true,
             game: {
                 doubles: 0,
                 triples: 0,
@@ -65,9 +66,25 @@ class App extends Component {
     };
 
     toggleNavbar() {
-        $(document.body).animate({"padding": 0});
-        $('#sideNav').animate({"width":0});
+        $(document.body).animate({"paddingLeft": 0});
+        $('#sideNav').animate({"width": 0});
         document.getElementById("sideNav").className += " hidden";
+    }
+
+    toggleNavbarBack = () => {
+        this.setState({
+            collapsed: !this.state.collapsed,
+        });
+        if (this.state.collapsed) {
+            $(document.body).animate({"paddingLeft": "17rem"});
+            $('#sideNav').animate({"width": 272});
+            document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
+            document.getElementById("sideNav").style.display = "flex";
+        } else {
+            $(document.body).animate({"paddingLeft": 0});
+            $('#sideNav').animate({"width": 0});
+            document.getElementById("sideNav").className += " hidden";
+        }
     }
 
 
@@ -81,7 +98,9 @@ class App extends Component {
                     getPlayerName={this.getPlayerName}
                     toggleNavbar={this.toggleNavbar}
                 />
-                <DartBoard/>
+                <DartBoard
+                    toggleNavbarBack={this.toggleNavbarBack}
+                />
                 <Hint/>
             </div>
         );
