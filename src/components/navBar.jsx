@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css'
 import whitedart from '../whitedart.png';
 import $ from 'jquery';
-import 'bootstrap/js/dist/collapse';
+import 'bootstrap/js/src/collapse';
 
 
 class NavBar extends Component {
