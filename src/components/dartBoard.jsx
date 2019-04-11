@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css';
 import '../board.css';
 import hamburger from '../hmenu.png';
+import Table from './table';
 
 class DartBoard extends Component {
 
@@ -73,15 +74,29 @@ class DartBoard extends Component {
         }
     }
 
+    getBoard() {
+        if (localStorage.getItem("gameId")) {
+            return (
+                <Table
+                    game = {this.props.game}
+                    playerOne = {this.props.playerOne}
+                    playerTwo = {this.props.playerTwo}
+                    />
+            )
+        }
+    };
+
 
     render() {
         const openMenu = this.openMenuButton();
+        const getBoard = this.getBoard();
+
         return (
             <section className="resume-section p-3 p-lg-5 d-flex" id="board">
                 <div className="left-top">
                     {openMenu}
                 </div>
-                <div className="board container-fluid p-0 text-center">
+                <div className="board container-fluid p-0 text-center justify-content-center">
                     <svg id="dartboard"
                          version="1.1" x="0px" y="0px" width="787px" height="774px" viewBox="0 0 787 774"
                          enableBackground="new 0 0 787 774">
@@ -225,6 +240,7 @@ class DartBoard extends Component {
                     </svg>
                     <button id="nullbutton" className="btn outbutton btn-lg mt-3 fontchange">OUT OF BOARD</button>
                 </div>
+                    {getBoard}
             </section>
         )
     }
