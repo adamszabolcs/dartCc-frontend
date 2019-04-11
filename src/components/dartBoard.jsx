@@ -27,7 +27,7 @@ class DartBoard extends Component {
         if (id === 'nullbutton') {
             return 0;
         } else if (id === 'Bull') {
-            // game._doubles++;
+            this.props.setDoubles(this.props.game.doubles);
             return 50;
         } else if (id === 'Outer') {
             return 25;
@@ -39,11 +39,11 @@ class DartBoard extends Component {
                 mod = 1;
                 break;
             case 'd':
-                // game._doubles++;
+                this.props.setDoubles();
                 mod = 2;
                 break;
             case 't':
-                // game._triples++;
+                this.props.setTriples();
                 mod = 3;
                 break;
             default:
