@@ -94,7 +94,7 @@ class App extends Component {
                 $('#tablescore').css("width", "");
             });
         }
-    }
+    };
 
     setDoubles = () => {
         let game = {...this.state.game};
@@ -353,11 +353,6 @@ class App extends Component {
 
     revertTurnStats() {
         let game = {...this.state.game};
-        // if (this.state.game.actualPlayer === 'p1') {
-        //     game.playerOneScore = this.state.playerOne.turnScore;
-        // } else {
-        //     game.playerTwoScore = this.state.playerTwo.turnScore;
-        // }
         game.turnScore = 0;
         game.turnCounter = 0;
         this.setState({game});
