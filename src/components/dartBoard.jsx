@@ -10,59 +10,9 @@ class DartBoard extends Component {
     componentDidMount() {
         let elements = document.querySelectorAll('#dartboard #areas g path, #dartboard #areas g circle, #Bull, #Outer, #nullbutton');
         for (let elem of elements) {
-            elem.addEventListener('click', this.countScore);
+            elem.addEventListener('click', this.props.countScore);
         }
     };
-
-    getId = e => {
-        e.preventDefault();
-        let id = e.target.getAttribute('id');
-        return id;
-    };
-
-    getDartValueFromID = e => {
-        e.preventDefault();
-        let id = this.getId(e);
-
-        if (id === 'nullbutton') {
-            return 0;
-        } else if (id === 'Bull') {
-            this.props.setDoubles(this.props.game.doubles);
-            return 50;
-        } else if (id === 'Outer') {
-            return 25;
-        }
-
-        let mod = 0;
-        switch (id[0]) {
-            case 's':
-                mod = 1;
-                break;
-            case 'd':
-                this.props.setDoubles();
-                mod = 2;
-                break;
-            case 't':
-                this.props.setTriples();
-                mod = 3;
-                break;
-            default:
-                mod = 1;
-        }
-        return mod * parseInt(id.substr(1));
-    };
-
-    countScore = e => {
-        e.preventDefault();
-        let score = this.getDartValueFromID(e);
-        console.log(score);
-        // game.registerTurn(score, e);
-    };
-
-    substractScore(score) {
-        console.log(score);
-        this.sendTurnInformation(score);
-    }
 
     openMenuButton() {
         if (localStorage.getItem("gameId")) {
