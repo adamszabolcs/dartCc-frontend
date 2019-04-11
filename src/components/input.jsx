@@ -18,9 +18,14 @@ class Input extends Component {
                 "Content-Type": "application/json",
             },
             body: players,
-        });
+        })
+            .then(resp => localStorage.setItem("gameId", resp))
+            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
+            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name));
         this.props.toggleNavbar();
     };
+
+    setPlayerName
 
 
 
