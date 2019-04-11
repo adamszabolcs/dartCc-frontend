@@ -1,7 +1,26 @@
 import React, {Component} from 'react';
 
 class Table extends Component {
+
+    checkPlayerOne() {
+        if (this.props.playerOne.name === "") {
+            return localStorage.getItem("playerOne");
+        } else {
+            return this.props.playerOne.name;
+        }
+    }
+
+    checkPlayerTwo() {
+        if (this.props.playerTwo.name === "") {
+            return localStorage.getItem("playerTwo");
+        } else {
+            return this.props.playerTwo.name;
+        }
+    }
+
     render() {
+        const playerOneName = this.checkPlayerOne();
+        const playerTwoName = this.checkPlayerTwo();
         return (
             <div className="col-sm-auto align-items-center justify-content-center scoretable" id="tablescore">
                 <div id="p1-win"></div>
@@ -11,9 +30,9 @@ class Table extends Component {
                     <tr>
                         <th scope="col"></th>
                         <th scope="col" id="p1-nameH1" style={{color: "rgb(79, 153, 98)"}}>
-                            {this.props.playerOne.name}
+                            {playerOneName}
                         </th>
-                        <th scope="col" id="p2-nameH1">{this.props.playerTwo.name}</th>
+                        <th scope="col" id="p2-nameH1">{playerTwoName}</th>
                     </tr>
                     </thead>
                     <tbody>
