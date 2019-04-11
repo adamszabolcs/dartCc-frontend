@@ -51,17 +51,18 @@ class App extends Component {
 
     getPlayerName = e => {
         e.preventDefault();
+        let player;
         if (e.target.name === "p1name") {
+            player = {...this.state.playerOne};
+            player.name = e.target.value;
             this.setState({
-                playerOne: {
-                    name: e.target.value,
-                }
+                playerOne: player
             });
         } else {
+            player = {...this.state.playerTwo};
+            player.name = e.target.value;
             this.setState({
-                playerTwo: {
-                    name: e.target.value,
-                }
+                playerTwo: player
             });
         }
     };
