@@ -93,6 +93,18 @@ class App extends Component {
         }
     }
 
+    setDoubles = () => {
+        let game = {...this.state.game};
+        game.doubles++;
+        this.setState({game});
+    };
+
+    setTriples = () => {
+        let game = {...this.state.game};
+        game.triples++;
+        this.setState({game});
+    };
+
     render() {
         return (
             <div className="App">
@@ -108,6 +120,8 @@ class App extends Component {
                     playerTwo={this.state.playerTwo}
                     game={this.state.game}
                     toggleNavbarBack={this.toggleNavbarBack}
+                    setDoubles={this.setDoubles}
+                    setTriples={this.setTriples}
                 />
                 <Hint/>
             </div>
