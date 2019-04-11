@@ -30,7 +30,6 @@ class App extends Component {
                 bestOfThree: 0,
                 wins: 0,
                 turnScore: 0,
-                pointRemaining: 301,
                 avgPerDart: 0,
                 avgPerRound: 0,
             },
@@ -41,7 +40,6 @@ class App extends Component {
                 bestOfThree: 0,
                 wins: 0,
                 turnScore: 0,
-                pointRemaining: 301,
                 avgPerDart: 0,
                 avgPerRound: 0,
             }
@@ -77,16 +75,23 @@ class App extends Component {
         });
         if (this.state.collapsed) {
             $(document.body).animate({"paddingLeft": "17rem"});
-            $('#sideNav').animate({"width": 272});
+            $('#sideNav').animate({"width": 272}, 500);
             document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
             document.getElementById("sideNav").style.display = "flex";
+            $('.scoretable').animate({"width": 0},500, 0, function () {
+                document.getElementById('tablescore').className += " hidden";
+            });
         } else {
             $(document.body).animate({"paddingLeft": 0});
-            $('#sideNav').animate({"width": 0});
-            document.getElementById("sideNav").className += " hidden";
+            $('#sideNav').animate({"width": 0}, 500, 0, function () {
+                document.getElementById("sideNav").className += " hidden";
+            });
+            document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
+            $('#tablescore').animate({"width": 300}, 1000, 0, function() {
+                $('#tablescore').css("width", "");
+            });
         }
     }
-
 
     render() {
         return (
@@ -99,6 +104,9 @@ class App extends Component {
                     toggleNavbar={this.toggleNavbar}
                 />
                 <DartBoard
+                    playerOne={this.state.playerOne}
+                    playerTwo={this.state.playerTwo}
+                    game={this.state.game}
                     toggleNavbarBack={this.toggleNavbarBack}
                 />
                 <Hint/>
