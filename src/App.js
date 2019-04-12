@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
 import DartBoard from './components/dartBoard';
 import NavBar from './components/navBar';
@@ -14,6 +13,7 @@ class App extends Component {
         this.state = {
             collapsed: true,
             game: {
+                gameId: null,
                 doubles: 0,
                 triples: 0,
                 round: 1,
@@ -21,7 +21,7 @@ class App extends Component {
                 playerTwoOriginalScore: 301,
                 playerOneScore: 301,
                 playerTwoScore: 301,
-                turnCounter: 0,
+                throwCounter: 0,
                 actualPlayer: "p1",
                 winner: null,
                 turnScore: 0,
@@ -49,7 +49,10 @@ class App extends Component {
         }
     }
 
-    getPlayerName = e => {
+    // GETTERS AND SETTERS FOR THE GAME
+
+    setPlayersName = e => {
+        // when game created, sets players name
         e.preventDefault();
         let player;
         if (e.target.name === "p1name") {
@@ -67,72 +70,36 @@ class App extends Component {
         }
     };
 
-    toggleNavbar() {
-        $(document.body).animate({"paddingLeft": 0});
-        $('#sideNav').animate({"width": 0});
-        document.getElementById("sideNav").className += " hidden";
-    }
-
-    toggleNavbarBack = () => {
-        this.setState({
-            collapsed: !this.state.collapsed,
-        });
-        if (this.state.collapsed) {
-            $(document.body).animate({"paddingLeft": "17rem"});
-            $('#sideNav').animate({"width": 272}, 500);
-            document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
-            document.getElementById("sideNav").style.display = "flex";
-            $('.scoretable').animate({"width": 0}, 500, 0, function () {
-                document.getElementById('tablescore').className += " hidden";
-            });
-        } else {
-            $(document.body).animate({"paddingLeft": 0});
-            $('#sideNav').animate({"width": 0}, 500, 0, function () {
-                document.getElementById("sideNav").className += " hidden";
-            });
-            document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
-            $('#tablescore').animate({"width": 300}, 1000, 0, function () {
-                $('#tablescore').css("width", "");
-            });
-        }
-    };
-
-    setDoubles = () => {
+    incrementDoubles = () => {
+        // if someone throws double, increment double counter
         let game = {...this.state.game};
         game.doubles++;
         this.setState({game});
     };
 
-    setTriples = () => {
+    incrementTriples = () => {
+        // if someone throws triple, increment triple counter
         let game = {...this.state.game};
         game.triples++;
         this.setState({game});
     };
 
-    setTurnCounter() {
+    incrementThrowCounter() {
+        //if throw happened, increment throwcounter by 1
         let game = {...this.state.game};
-        game.turnCounter++;
+        game.throwCounter++;
         this.setState({game});
     };
 
-    isThrowValid(playerScore, turnScore) {
-        return (playerScore - turnScore) >= 2 || (playerScore - turnScore === 0);
-    };
-
-    countScore = e => {
-        e.preventDefault();
-        let score = this.getDartValueFromID(e);
-        console.log(score);
-        this.registerTurn(score, e);
-    };
-
     setTurnScore = score => {
+        // if throw happened, increment turnScore by score
         let game = {...this.state.game};
         game.turnScore += score;
         this.setState({game});
     };
 
     setPlayerScoreRemaining = score => {
+        // if valid throw happened, subtract score from player score
         let game = {...this.state.game};
         if (this.state.game.actualPlayer === "p1") {
             game.playerOneScore -= score;
@@ -142,7 +109,163 @@ class App extends Component {
         this.setState({game});
     };
 
+    setWinner = player => {
+        // if valid win condition happened, set winner
+        let game = {...this.state.game};
+        if (player === 'p1') {
+            game.winner = this.state.playerOne.name;
+        } else {
+            game.winner = this.state.playerTwo.name;
+        }
+        this.setState({game});
+    };
+
+    getId = e => {
+        // get clicked area's id on the board
+        e.preventDefault();
+        let id = e.target.getAttribute('id');
+        return id;
+    };
+
+    setHighestTurn = () => {
+        // after turn ended, checks if players best of three is lower than turnscore,
+        // if it's true, sets players best of three
+        let player;
+        if (this.state.game.actualPlayer === 'p1') {
+            player = {...this.state.playerOne};
+        } else {
+            player = {...this.state.playerTwo};
+        }
+        if (this.state.game.turnScore > player.bestOfThree) {
+            player.bestOfThree = this.state.game.turnScore;
+        }
+        if (this.state.game.actualPlayer === 'p1') {
+            this.setState({playerOne: player});
+        } else {
+            this.setState({playerTwo: player});
+        }
+    };
+
+    setScoreBack() {
+        // if turn is not valid, i.e. thrown more than remaining score, score sets back to score before turn
+        let game = {...this.state.game};
+        if (game.actualPlayer === 'p1') {
+            game.playerOneScore = game.playerOneOriginalScore;
+        } else {
+            game.playerTwoScore = game.playerTwoOriginalScore;
+        }
+        this.setState({game});
+    };
+
+    setGameId = (gameId) => {
+        // when game created, sets the gameId
+        let game = {...this.state.game};
+        game.gameId = gameId;
+        this.setState({game});
+    };
+
+    setOriginalScore() {
+        // if turn is valid, sets original score to player remaining score
+        let game = {...this.state.game};
+        if (game.actualPlayer === "p1") {
+            game.playerOneOriginalScore = game.playerOneScore;
+        } else {
+            game.playerTwoOriginalScore = game.playerTwoScore;
+        }
+        this.setState({game});
+    }
+
+    getDartValueFromID = e => {
+        // checks if clicked areas id is simple, double or triple, sets the mod according to the first letter of id,
+        // return thrown score
+        e.preventDefault();
+        let id = this.getId(e);
+
+        if (id === 'nullbutton') {
+            return 0;
+        } else if (id === 'Bull') {
+            this.incrementDoubles();
+            return 50;
+        } else if (id === 'Outer') {
+            return 25;
+        }
+
+        let mod = 0;
+        switch (id[0]) {
+            case 's':
+                mod = 1;
+                break;
+            case 'd':
+                this.incrementDoubles();
+                mod = 2;
+                break;
+            case 't':
+                this.incrementTriples();
+                mod = 3;
+                break;
+            default:
+                mod = 1;
+        }
+        return mod * parseInt(id.substr(1));
+    };
+
+    setActualPlayer() {
+        // if throwCounter is 3 or turn is invalid, changes actual player
+        let game = {...this.state.game};
+        if (game.actualPlayer === 'p1') {
+            game.actualPlayer = 'p2';
+        } else {
+            game.round += 1;
+            game.actualPlayer = 'p1';
+        }
+        this.setState({game});
+    };
+
+    // GAME RELATED METHODS
+
+    registerThrow = (score, e) => {
+        // register throw, checks if throw is valid, if true, sets turn score, sets remaining points, checks if player
+        // wins, if throw is not valid, sets score back, sets highest turn and checks if changing player is necessary
+        this.incrementThrowCounter();
+        let actualPlayerScore;
+        switch (this.state.game.actualPlayer) {
+            case "p1":
+                actualPlayerScore = this.state.game.playerOneScore;
+                break;
+            case "p2":
+                actualPlayerScore = this.state.game.playerTwoScore;
+                break;
+        }
+        if (this.isThrowValid(actualPlayerScore, score)) {
+            this.setTurnScore(score);
+            this.setPlayerScoreRemaining(score);
+            if (actualPlayerScore === 0) {
+                if (this.checkWin(e, actualPlayerScore)) {
+                    this.win();
+                }
+            }
+        } else {
+            this.setScoreBack();
+        }
+        this.setHighestTurn();
+        this.changePlayer(actualPlayerScore, score);
+    };
+
+    isThrowValid(playerScore, turnScore) {
+        // checks if throw is valid
+        return (playerScore - turnScore) >= 2 || (playerScore - turnScore === 0);
+    };
+
+    countScore = e => {
+        // gets thrown score, starts registering the throw
+        e.preventDefault();
+        let score = this.getDartValueFromID(e);
+        console.log(score);
+        this.registerThrow(score, e);
+    };
+
     checkWin = (e, actualPlayerScore) => {
+        // checks if player won
         e.preventDefault();
         let id = this.getId(e);
         if (this.state.game.actualPlayer === "p1")
@@ -153,13 +276,53 @@ class App extends Component {
     };
 
     win() {
+        //sets and shows winner, send turn to backend
         let winner = document.getElementById(this.state.game.actualPlayer + "-win");
         winner.innerHTML = `<h1>WINNER!!!</h1>`;
         this.setWinner(this.state.game.actualPlayer);
         this.sendTurnToBackend();
     };
 
+    changePlayer = (actualPlayerScore, score) => {
+        // if throw is not valid or third throw in a turn, sets original score, calculates and sets average for player,
+        // sends turn to backend, changes player and revert necessary incremented stats to zero
+        if (this.state.game.throwCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
+            this.setOriginalScore();
+            this.calculateAndSetAverage();
+            this.sendTurnToBackend();
+            this.setActualPlayer();
+            this.revertTurnStats();
+        }
+    };
+
+    calculateAndSetAverage() {
+        // calculates and sets average to player at the end of his/her turn
+        let player;
+        if (this.state.game.actualPlayer === 'p1') {
+            player = {...this.state.playerOne};
+            player.avgPerDart = (((301 - this.state.game.playerOneScore) / this.state.game.round) / 3).toFixed(1);
+            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
+            this.setState({playerOne:player});
+        } else {
+            player = {...this.state.playerTwo};
+            player.avgPerDart = (((301 - this.state.game.playerTwoScore) / this.state.game.round) / 3).toFixed(1);
+            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
+            this.setState({playerTwo:player});
+        }
+    };
+
+    revertTurnStats() {
+        // after a turn, sets back the turnscore and throwcounter to zero
+        let game = {...this.state.game};
+        game.turnScore = 0;
+        game.throwCounter = 0;
+        this.setState({game});
+    };
+
+    //COMMUNICATION WITH BACKEND
+
     sendTurnToBackend = () => {
+        //after turn, sends the necessary information to the backend
         let body = JSON.stringify({
             game: {
                 doubles: this.state.game.doubles,
@@ -193,115 +356,36 @@ class App extends Component {
         })
     };
 
-    setWinner = player => {
-        let game = {...this.state.game};
-        if (player === 'p1') {
-            game.winner = this.state.playerOne.name;
-        } else {
-            game.winner = this.state.playerTwo.name;
-        }
-        this.setState({game});
-    };
-
-    getId = e => {
-        e.preventDefault();
-        let id = e.target.getAttribute('id');
-        return id;
-    };
-
-    setHighestTurn = () => {
-        let player;
-        if (this.state.game.actualPlayer === 'p1') {
-            player = {...this.state.playerOne};
-        } else {
-            player = {...this.state.playerTwo};
-        }
-        if (this.state.game.turnScore > player.bestOfThree) {
-            player.bestOfThree = this.state.game.turnScore;
-        }
-        if (this.state.game.actualPlayer === 'p1') {
-            this.setState({playerOne: player});
-        } else {
-            this.setState({playerTwo: player});
-        }
-    };
-
-    registerTurn = (score, e) => {
-        this.setTurnCounter();
-        let actualPlayerScore;
-        switch (this.state.game.actualPlayer) {
-            case "p1":
-                actualPlayerScore = this.state.game.playerOneScore;
-                break;
-            case "p2":
-                actualPlayerScore = this.state.game.playerTwoScore;
-                break;
-        }
-        if (this.isThrowValid(actualPlayerScore, score)) {
-            this.setTurnScore(score);
-            this.setPlayerScoreRemaining(score);
-            if (actualPlayerScore === 0) {
-                if (this.checkWin(e, actualPlayerScore)) {
-                    this.win();
-                }
-            }
-        } else {
-            this.setScoreBack();
-        }
-        this.setHighestTurn();
-        this.changePlayer(actualPlayerScore, score);
-    };
-
-    setScoreBack() {
-        let game = {...this.state.game};
-        if (game.actualPlayer === 'p1') {
-            game.playerOneScore = game.playerOneOriginalScore;
-        } else {
-            game.playerTwoScore = game.playerTwoOriginalScore;
-        }
-        this.setState({game});
+    toggleNavbar() {
+        // after game created, hides the navbar
+        $(document.body).animate({"paddingLeft": 0});
+        $('#sideNav').animate({"width": 0});
+        document.getElementById("sideNav").className += " hidden";
     }
 
-    changePlayer = (actualPlayerScore, score) => {
-        if (this.state.game.turnCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
-            this.setOriginalScore();
-            this.calculateAndSetAverage();
-            this.sendTurnToBackend();
-            this.setActualPlayer();
-            this.revertTurnStats();
+    toggleNavbarBack = () => {
+        // if hamburger icon clicked, either table collapses and menu shown or menu collapses and table shown
+        this.setState({
+            collapsed: !this.state.collapsed,
+        });
+        if (this.state.collapsed) {
+            $(document.body).animate({"paddingLeft": "17rem"});
+            $('#sideNav').animate({"width": 272}, 500);
+            document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
+            document.getElementById("sideNav").style.display = "flex";
+            $('.scoretable').animate({"width": 0}, 500, 0, function () {
+                document.getElementById('tablescore').className += " hidden";
+            });
+        } else {
+            $(document.body).animate({"paddingLeft": 0});
+            $('#sideNav').animate({"width": 0}, 500, 0, function () {
+                document.getElementById("sideNav").className += " hidden";
+            });
+            document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
+            $('#tablescore').animate({"width": 300}, 1000, 0, function () {
+                $('#tablescore').css("width", "");
+            });
         }
-    };
-
-    getDartValueFromID = e => {
-        e.preventDefault();
-        let id = this.getId(e);
-
-        if (id === 'nullbutton') {
-            return 0;
-        } else if (id === 'Bull') {
-            this.setDoubles(this.state.game.doubles);
-            return 50;
-        } else if (id === 'Outer') {
-            return 25;
-        }
-
-        let mod = 0;
-        switch (id[0]) {
-            case 's':
-                mod = 1;
-                break;
-            case 'd':
-                this.setDoubles();
-                mod = 2;
-                break;
-            case 't':
-                this.setTriples();
-                mod = 3;
-                break;
-            default:
-                mod = 1;
-        }
-        return mod * parseInt(id.substr(1));
     };
 
     render() {
@@ -311,8 +395,9 @@ class App extends Component {
                 <Input
                     playerOne={this.state.playerOne}
                     playerTwo={this.state.playerTwo}
-                    getPlayerName={this.getPlayerName}
+                    getPlayerName={this.setPlayersName}
                     toggleNavbar={this.toggleNavbar}
+                    setGameId={this.setGameId}
                 />
                 <DartBoard
                     playerOne={this.state.playerOne}
@@ -324,49 +409,6 @@ class App extends Component {
                 <Hint/>
             </div>
         );
-    }
-
-    setActualPlayer() {
-        let game = {...this.state.game};
-        if (game.actualPlayer === 'p1') {
-            game.actualPlayer = 'p2';
-        } else {
-            game.round += 1;
-            game.actualPlayer = 'p1';
-        }
-        this.setState({game});
-    };
-
-    calculateAndSetAverage() {
-        let player;
-        if (this.state.game.actualPlayer === 'p1') {
-            player = {...this.state.playerOne};
-            player.avgPerDart = (((301 - this.state.game.playerOneScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerOne:player});
-        } else {
-            player = {...this.state.playerTwo};
-            player.avgPerDart = (((301 - this.state.game.playerTwoScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerTwo:player});
-        }
-    };
-
-    revertTurnStats() {
-        let game = {...this.state.game};
-        game.turnScore = 0;
-        game.turnCounter = 0;
-        this.setState({game});
-    };
-
-    setOriginalScore() {
-        let game = {...this.state.game};
-        if (game.actualPlayer === "p1") {
-            game.playerOneOriginalScore = game.playerOneScore;
-        } else {
-            game.playerTwoOriginalScore = game.playerTwoScore;
-        }
-        this.setState({game});
     }
 }
 
