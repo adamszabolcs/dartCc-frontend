@@ -19,14 +19,16 @@ class Input extends Component {
             },
             body: players,
         })
-            .then(resp => localStorage.setItem("gameId", resp))
+            .then(resp => resp.json())
+            .then(function (data) {
+                localStorage.setItem("gameId", data);
+            })
             .then(localStorage.setItem("playerOne", this.props.playerOne.name))
-            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name));
-        this.props.toggleNavbar();
+            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
+            .then(window.location.hash = "#board")
+            .then(this.props.toggleNavbar())
+            .then(this.props.setGameId(localStorage.getItem("gameId")));
     };
-
-    setPlayerName
-
 
 
     render() {
@@ -39,14 +41,14 @@ class Input extends Component {
                         <input className="form-control"
                                type="text" name="p1name" value={this.props.playerOne.name}
                                placeholder="Player 1 name"
-                               onChange={this.props.getPlayerName}/>
+                               onChange={this.props.setPlayersName}/>
                         <br/>
                         <input className="form-control"
                                type="text" name="p2name" value={this.props.playerTwo.name}
                                placeholder="Player 2 name"
-                               onChange={this.props.getPlayerName}/>
+                               onChange={this.props.setPlayersName}/>
                         <br/>
-                        <a className="btn playbutton fontchange" onClick={this.createGame} href="#board"> LET'S PLAY!</a>
+                        <a className="btn playbutton fontchange" onClick={this.createGame}> LET'S PLAY!</a>
                     </form>
                 </div>
             </section>
