@@ -18,30 +18,37 @@ class Input extends Component {
                 "Content-Type": "application/json",
             },
             body: players,
-        });
-        this.props.toggleNavbar();
+        })
+            .then(resp => resp.json())
+            .then(function (data) {
+                localStorage.setItem("gameId", data);
+            })
+            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
+            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
+            .then(window.location.hash = "#board")
+            .then(this.props.toggleNavbar())
+            .then(this.props.setGameId(localStorage.getItem("gameId")));
     };
-
 
 
     render() {
         return (
-            <section className="resume-section d-flex" id="letsplay" style={{padding: "5rem"}}>
+            <section className="resume-section d-flex justify-content-center" id="letsplay" style={{padding: "5rem"}}>
                 <div className="text-center">
-                    <h1>LET'S PLAY!</h1>
+                    <h1 style={{color: "#e33717"}}>LET'S PLAY!</h1>
+                    <br/>
                     <form>
                         <input className="form-control"
                                type="text" name="p1name" value={this.props.playerOne.name}
                                placeholder="Player 1 name"
-                               onChange={this.props.getPlayerName}/>
+                               onChange={this.props.setPlayersName}/>
                         <br/>
                         <input className="form-control"
                                type="text" name="p2name" value={this.props.playerTwo.name}
                                placeholder="Player 2 name"
-                               onChange={this.props.getPlayerName}/>
+                               onChange={this.props.setPlayersName}/>
                         <br/>
-                        <a className="btn btn-primary" onClick={this.createGame} href="#board"> Let's
-                            play!</a>
+                        <a className="btn playbutton fontchange" onClick={this.createGame}> LET'S PLAY!</a>
                     </form>
                 </div>
             </section>

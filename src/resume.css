@@ -215,3 +215,8 @@ li a:hover, a:focus, a.current {
 .hidden {
   display: none !important;
 }
+
+.playbutton {
+  background-color: #fac20c;
+  color: #212529 !important;
+}

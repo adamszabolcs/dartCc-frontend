@@ -3,65 +3,16 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../resume.css';
 import '../board.css';
 import hamburger from '../hmenu.png';
+import Table from './table';
 
 class DartBoard extends Component {
 
     componentDidMount() {
         let elements = document.querySelectorAll('#dartboard #areas g path, #dartboard #areas g circle, #Bull, #Outer, #nullbutton');
         for (let elem of elements) {
-            elem.addEventListener('click', this.countScore);
+            elem.addEventListener('click', this.props.countScore);
         }
     };
-
-    getId = e => {
-        e.preventDefault();
-        let id = e.target.getAttribute('id');
-        return id;
-    };
-
-    getDartValueFromID = e => {
-        e.preventDefault();
-        let id = this.getId(e);
-
-        if (id === 'nullbutton') {
-            return 0;
-        } else if (id === 'Bull') {
-            // game._doubles++;
-            return 50;
-        } else if (id === 'Outer') {
-            return 25;
-        }
-
-        let mod = 0;
-        switch (id[0]) {
-            case 's':
-                mod = 1;
-                break;
-            case 'd':
-                // game._doubles++;
-                mod = 2;
-                break;
-            case 't':
-                // game._triples++;
-                mod = 3;
-                break;
-            default:
-                mod = 1;
-        }
-        return mod * parseInt(id.substr(1));
-    };
-
-    countScore = e => {
-        e.preventDefault();
-        let score = this.getDartValueFromID(e);
-        console.log(score);
-        // game.registerTurn(score, e);
-    };
-
-    substractScore(score) {
-        console.log(score);
-        this.sendTurnInformation(score);
-    }
 
     openMenuButton() {
         if (localStorage.getItem("gameId")) {
@@ -73,15 +24,29 @@ class DartBoard extends Component {
         }
     }
 
+    getBoard() {
+        if (localStorage.getItem("gameId")) {
+            return (
+                <Table
+                    game = {this.props.game}
+                    playerOne = {this.props.playerOne}
+                    playerTwo = {this.props.playerTwo}
+                    />
+            )
+        }
+    };
+
 
     render() {
         const openMenu = this.openMenuButton();
+        const getBoard = this.getBoard();
+
         return (
             <section className="resume-section p-3 p-lg-5 d-flex" id="board">
                 <div className="left-top">
                     {openMenu}
                 </div>
-                <div className="board container-fluid p-0 text-center">
+                <div className="board container-fluid p-0 text-center justify-content-center">
                     <svg id="dartboard"
                          version="1.1" x="0px" y="0px" width="787px" height="774px" viewBox="0 0 787 774"
                          enableBackground="new 0 0 787 774">
@@ -225,6 +190,7 @@ class DartBoard extends Component {
                     </svg>
                     <button id="nullbutton" className="btn outbutton btn-lg mt-3 fontchange">OUT OF BOARD</button>
                 </div>
+                    {getBoard}
             </section>
         )
     }
