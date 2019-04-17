@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import '../resume.css';
 
 class Table extends Component {
 
@@ -29,7 +30,7 @@ class Table extends Component {
                     <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col" id="p1-nameH1" style={{color: "rgb(79, 153, 98)"}}>
+                        <th scope="col" id="p1-nameH1">
                             {playerOneName}
                         </th>
                         <th scope="col" id="p2-nameH1">{playerTwoName}</th>
