@@ -93,6 +93,23 @@ class App extends Component {
 
     setTurnScore = score => {
         // if throw happened, increment turnScore by score
+        let actualPlayer;
+        switch (this.state.game.actualPlayer) {
+            case 'p1':
+                actualPlayer = {...this.state.playerOne};
+                actualPlayer.turnScore += score;
+                this.setState({
+                    playerOne: actualPlayer
+                });
+                break;
+            case 'p2':
+                actualPlayer = {...this.state.playerTwo};
+                actualPlayer.turnScore += score;
+                this.setState({
+                    playerTwo: actualPlayer
+                });
+                break;
+        }
         let game = {...this.state.game};
         game.turnScore += score;
         this.setState({game});
@@ -166,13 +183,15 @@ class App extends Component {
 
     setOriginalScore() {
         // if turn is valid, sets original score to player remaining score
-        let game = {...this.state.game};
-        if (game.actualPlayer === "p1") {
-            game.playerOneOriginalScore = game.playerOneScore;
-        } else {
-            game.playerTwoOriginalScore = game.playerTwoScore;
+        if (this.state.game.throwCounter === 3) {
+            let game = {...this.state.game};
+            if (game.actualPlayer === "p1") {
+                game.playerOneOriginalScore = game.playerOneScore;
+            } else {
+                game.playerTwoOriginalScore = game.playerTwoScore;
+            }
+            this.setState({game});
         }
-        this.setState({game});
     }
 
     getDartValueFromID = e => {
@@ -213,8 +232,12 @@ class App extends Component {
         // if throwCounter is 3 or turn is invalid, changes actual player
         let game = {...this.state.game};
         if (game.actualPlayer === 'p1') {
+            document.getElementById('p2-nameH1').className = 'highlighted';
+            document.getElementById('p1-nameH1').classList.remove('highlighted');
             game.actualPlayer = 'p2';
         } else {
+            document.getElementById('p1-nameH1').className = 'highlighted';
+            document.getElementById('p2-nameH1').classList.remove('highlighted');
             game.round += 1;
             game.actualPlayer = 'p1';
         }
@@ -227,6 +250,7 @@ class App extends Component {
         // register throw, checks if throw is valid, if true, sets turn score, sets remaining points, checks if player
         // wins, if throw is not valid, sets score back, sets highest turn and checks if changing player is necessary
         this.incrementThrowCounter();
+        this.revertTurnScoreForPlayers();
         let actualPlayerScore;
         switch (this.state.game.actualPlayer) {
             case "p1":
@@ -239,9 +263,11 @@ class App extends Component {
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
-            if (actualPlayerScore === 0) {
-                if (this.checkWin(e, actualPlayerScore)) {
+            if (actualPlayerScore - score === 0) {
+                if (this.checkWin(e, actualPlayerScore - score)) {
                     this.win();
+                } else {
+                    this.setScoreBack();
                 }
             }
         } else {
@@ -253,7 +279,7 @@ class App extends Component {
 
     isThrowValid(playerScore, turnScore) {
         // checks if throw is valid
-        return (playerScore - turnScore) >= 2 || (playerScore - turnScore === 0);
+        return (playerScore - turnScore) >= 2 || (playerScore - turnScore) === 0;
     };
 
     countScore = e => {
@@ -268,17 +294,26 @@ class App extends Component {
         // checks if player won
         e.preventDefault();
         let id = this.getId(e);
-        if (this.state.game.actualPlayer === "p1")
-            if (id[0] === 'd' && actualPlayerScore === 0) {
-                return true;
-            }
+        if (id[0] === 'd' && actualPlayerScore === 0) {
+            return true;
+        }
         return false;
     };
 
     win() {
         //sets and shows winner, send turn to backend
+        console.log("WIN!!!!");
         let winner = document.getElementById(this.state.game.actualPlayer + "-win");
-        winner.innerHTML = `<h1>WINNER!!!</h1>`;
+        let winnerPlayer;
+        switch (this.state.game.actualPlayer) {
+            case 'p1':
+                winnerPlayer = this.state.playerOne.name;
+                break;
+            case 'p2':
+                winnerPlayer = this.state.playerTwo.name;
+                break;
+        }
+        winner.innerHTML = `<h3>The winner is ` + winnerPlayer + `!</h3>`;
         this.setWinner(this.state.game.actualPlayer);
         this.sendTurnToBackend();
     };
@@ -287,6 +322,7 @@ class App extends Component {
         // if throw is not valid or third throw in a turn, sets original score, calculates and sets average for player,
         // sends turn to backend, changes player and revert necessary incremented stats to zero
         if (this.state.game.throwCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
+            debugger;
             this.setOriginalScore();
             this.calculateAndSetAverage();
             this.sendTurnToBackend();
@@ -301,21 +337,27 @@ class App extends Component {
         if (this.state.game.actualPlayer === 'p1') {
             player = {...this.state.playerOne};
             player.avgPerDart = (((301 - this.state.game.playerOneScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerOne:player});
+            player.avgPerRound = (player.avgPerDart * 3).toFixed(1);
+            this.setState({playerOne: player});
         } else {
             player = {...this.state.playerTwo};
             player.avgPerDart = (((301 - this.state.game.playerTwoScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerTwo:player});
+            player.avgPerRound = (player.avgPerDart * 3).toFixed(1);
+            this.setState({playerTwo: player});
         }
     };
 
     revertTurnStats() {
         // after a turn, sets back the turnscore and throwcounter to zero
         let game = {...this.state.game};
+        let playerOne = {...this.state.playerOne};
+        let playerTwo = {...this.state.playerTwo};
+
         game.turnScore = 0;
         game.throwCounter = 0;
+        playerOne.turnScore = 0;
+        playerTwo.turnScore = 0;
+
         this.setState({game});
     };
 
@@ -395,7 +437,7 @@ class App extends Component {
                 <Input
                     playerOne={this.state.playerOne}
                     playerTwo={this.state.playerTwo}
-                    getPlayerName={this.setPlayersName}
+                    setPlayersName={this.setPlayersName}
                     toggleNavbar={this.toggleNavbar}
                     setGameId={this.setGameId}
                 />
@@ -409,6 +451,28 @@ class App extends Component {
                 <Hint/>
             </div>
         );
+    }
+
+    revertTurnScoreForPlayers() {
+        if (this.state.game.throwCounter === 1) {
+            let actualPlayer;
+            switch (this.state.game.actualPlayer) {
+                case 'p1':
+                    actualPlayer = {...this.state.playerOne};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerOne: actualPlayer,
+                    });
+                    break;
+                case 'p2':
+                    actualPlayer = {...this.state.playerTwo};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerTwo: actualPlayer,
+                    });
+                    break;
+            }
+        }
     }
 }
 
