@@ -260,6 +260,9 @@ class App extends Component {
                 actualPlayerScore = this.state.game.playerTwoScore;
                 break;
         }
+        if (this.state.game.throwCounter <= 2 && actualPlayerScore <= 170) {
+            this.callForSuggestion(actualPlayerScore);
+        }
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
@@ -360,6 +363,28 @@ class App extends Component {
         this.setState({game});
     };
 
+    revertTurnScoreForPlayers() {
+        if (this.state.game.throwCounter === 1) {
+            let actualPlayer;
+            switch (this.state.game.actualPlayer) {
+                case 'p1':
+                    actualPlayer = {...this.state.playerOne};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerOne: actualPlayer,
+                    });
+                    break;
+                case 'p2':
+                    actualPlayer = {...this.state.playerTwo};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerTwo: actualPlayer,
+                    });
+                    break;
+            }
+        }
+    }
+
     //COMMUNICATION WITH BACKEND
 
     sendTurnToBackend = () => {
@@ -398,6 +423,19 @@ class App extends Component {
         })
     };
 
+    callForSuggestion = actualPlayerScore => {
+        let howManyDarts = 3 - this.state.throwCounter;
+        let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
+        fetch(url)
+            .then(resp => resp.json())
+            .then(function (data) {
+                localStorage.setItem("suggestion", data);
+            })
+            .then(this.setSuggestion());
+    };
+
+    //DOM AND BACKEND
+
     toggleNavbar() {
         // after game created, hides the navbar
         $(document.body).animate({"paddingLeft": 0});
@@ -430,6 +468,11 @@ class App extends Component {
         }
     };
 
+    setSuggestion() {
+        let suggestion = document.getElementById("suggestion");
+        suggestion.innerHTML="<h3>" + localStorage.getItem("suggestion") + "</h3>";
+    }
+
     render() {
         return (
             <div className="App">
@@ -453,27 +496,6 @@ class App extends Component {
         );
     }
 
-    revertTurnScoreForPlayers() {
-        if (this.state.game.throwCounter === 1) {
-            let actualPlayer;
-            switch (this.state.game.actualPlayer) {
-                case 'p1':
-                    actualPlayer = {...this.state.playerOne};
-                    actualPlayer.turnScore = 0;
-                    this.setState({
-                        playerOne: actualPlayer,
-                    });
-                    break;
-                case 'p2':
-                    actualPlayer = {...this.state.playerTwo};
-                    actualPlayer.turnScore = 0;
-                    this.setState({
-                        playerTwo: actualPlayer,
-                    });
-                    break;
-            }
-        }
-    }
 }
 
 export default App;
