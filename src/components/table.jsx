@@ -64,6 +64,7 @@ class Table extends Component {
                     </tr>
                     </tbody>
                 </table>
+                <div id="suggestion"></div>
             </div>
         );
     }
