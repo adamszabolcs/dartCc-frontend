@@ -366,6 +366,7 @@ class App extends Component {
         //after turn, sends the necessary information to the backend
         let body = JSON.stringify({
             game: {
+                id: this.state.game.gameId,
                 doubles: this.state.game.doubles,
                 triples: this.state.game.triples,
                 round: this.state.game.round,
