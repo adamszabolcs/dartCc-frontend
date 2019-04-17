@@ -322,7 +322,6 @@ class App extends Component {
         // if throw is not valid or third throw in a turn, sets original score, calculates and sets average for player,
         // sends turn to backend, changes player and revert necessary incremented stats to zero
         if (this.state.game.throwCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
-            debugger;
             this.setOriginalScore();
             this.calculateAndSetAverage();
             this.sendTurnToBackend();
