@@ -266,7 +266,7 @@ class App extends Component {
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
-            if (this.state.game.throwCounter === 2) {
+            if (this.state.game.throwCounter === 1) {
                 this.callForSuggestion(actualPlayerScore - score);
             }
             if (actualPlayerScore - score === 0) {
@@ -392,9 +392,12 @@ class App extends Component {
 
     sendTurnToBackend = () => {
         //after turn, sends the necessary information to the backend
+        let gameId = this.state.game.gameId === -1 ? localStorage.getItem("gameId") : this.state.game.gameId;
+        let playerOneName = this.state.playerOne.name === "" ? localStorage.getItem("playerOne") : this.state.playerOne.name;
+        let playerTwoName = this.state.playerTwo.name === "" ? localStorage.getItem("playerTwo") : this.state.playerTwo.name;
         let body = JSON.stringify({
             game: {
-                id: this.state.game.gameId,
+                id: gameId,
                 doubles: this.state.game.doubles,
                 triples: this.state.game.triples,
                 round: this.state.game.round,
@@ -403,14 +406,14 @@ class App extends Component {
                 winner: this.state.game.winner
             },
             playerOne: {
-                name: this.state.playerOne.name,
+                name: playerOneName,
                 wins: this.state.playerOne.wins,
                 bestOfThree: this.state.playerOne.bestOfThree,
                 avgPerDart: this.state.playerOne.avgPerDart,
                 avgPerRound: this.state.playerOne.avgPerRound
             },
             playerTwo: {
-                name: this.state.playerTwo.name,
+                name: playerTwoName,
                 wins: this.state.playerTwo.wins,
                 bestOfThree: this.state.playerTwo.bestOfThree,
                 avgPerDart: this.state.playerTwo.avgPerDart,
@@ -428,14 +431,16 @@ class App extends Component {
 
     callForSuggestion = actualPlayerScore => {
         if (actualPlayerScore <= 170) {
-            let howManyDarts = 3 - this.state.throwCounter;
+            let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
             let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
             fetch(url)
                 .then(resp => resp.json())
                 .then(function (data) {
                     localStorage.setItem("suggestion", data);
                 })
-                .then(this.setSuggestion());
+                .finally(() => {
+                    this.setSuggestion();
+                });
         }
     };
 
