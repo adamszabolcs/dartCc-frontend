@@ -393,8 +393,10 @@ class App extends Component {
     sendTurnToBackend = () => {
         //after turn, sends the necessary information to the backend
         let gameId = this.state.game.gameId === -1 ? localStorage.getItem("gameId") : this.state.game.gameId;
-        let playerOneName = this.state.playerOne.name === "" ? localStorage.getItem("playerOne") : this.state.playerOne.name;
-        let playerTwoName = this.state.playerTwo.name === "" ? localStorage.getItem("playerTwo") : this.state.playerTwo.name;
+        let playerOneName = this.state.playerOne.name === "" ?
+            localStorage.getItem("playerOne") : this.state.playerOne.name;
+        let playerTwoName = this.state.playerTwo.name === "" ?
+            localStorage.getItem("playerTwo") : this.state.playerTwo.name;
         let body = JSON.stringify({
             game: {
                 id: gameId,
