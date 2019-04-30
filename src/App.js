@@ -13,7 +13,7 @@ class App extends Component {
         this.state = {
             collapsed: true,
             game: {
-                gameId: null,
+                gameId: -1,
                 doubles: 0,
                 triples: 0,
                 round: 1,
@@ -174,10 +174,10 @@ class App extends Component {
         this.setState({game});
     };
 
-    setGameId = (gameId) => {
+    setGameId = gameId => {
         // when game created, sets the gameId
         let game = {...this.state.game};
-        game.gameId = gameId;
+        game.gameId = parseInt(gameId);
         this.setState({game});
     };
 
@@ -229,17 +229,19 @@ class App extends Component {
     };
 
     setActualPlayer() {
-        // if throwCounter is 3 or turn is invalid, changes actual player
+        // if throwCounter is 3 or turn is invalid, changes actual player, call for checkout suggestion
         let game = {...this.state.game};
         if (game.actualPlayer === 'p1') {
             document.getElementById('p2-nameH1').className = 'highlighted';
             document.getElementById('p1-nameH1').classList.remove('highlighted');
             game.actualPlayer = 'p2';
+            this.callForSuggestion(this.state.game.playerTwoScore);
         } else {
             document.getElementById('p1-nameH1').className = 'highlighted';
             document.getElementById('p2-nameH1').classList.remove('highlighted');
             game.round += 1;
             game.actualPlayer = 'p1';
+            this.callForSuggestion(this.state.game.playerOneScore);
         }
         this.setState({game});
     };
@@ -247,8 +249,9 @@ class App extends Component {
     // GAME RELATED METHODS
 
     registerThrow = (score, e) => {
-        // register throw, checks if throw is valid, if true, sets turn score, sets remaining points, checks if player
-        // wins, if throw is not valid, sets score back, sets highest turn and checks if changing player is necessary
+        // register throw, checks if throw is valid, if true, sets turn score, sets remaining points,
+        // calls for suggestion, checks if player wins, if throw is not valid, sets score back,
+        // sets highest turn and checks if player changing is necessary
         this.incrementThrowCounter();
         this.revertTurnScoreForPlayers();
         let actualPlayerScore;
@@ -260,12 +263,12 @@ class App extends Component {
                 actualPlayerScore = this.state.game.playerTwoScore;
                 break;
         }
-        if (this.state.game.throwCounter <= 2 && actualPlayerScore <= 170) {
-            this.callForSuggestion(actualPlayerScore);
-        }
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
+            if (this.state.game.throwCounter === 2) {
+                this.callForSuggestion(actualPlayerScore - score);
+            }
             if (actualPlayerScore - score === 0) {
                 if (this.checkWin(e, actualPlayerScore - score)) {
                     this.win();
@@ -328,8 +331,8 @@ class App extends Component {
             this.setOriginalScore();
             this.calculateAndSetAverage();
             this.sendTurnToBackend();
-            this.setActualPlayer();
             this.revertTurnStats();
+            this.setActualPlayer();
         }
     };
 
@@ -424,14 +427,16 @@ class App extends Component {
     };
 
     callForSuggestion = actualPlayerScore => {
-        let howManyDarts = 3 - this.state.throwCounter;
-        let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
-        fetch(url)
-            .then(resp => resp.json())
-            .then(function (data) {
-                localStorage.setItem("suggestion", data);
-            })
-            .then(this.setSuggestion());
+        if (actualPlayerScore <= 170) {
+            let howManyDarts = 3 - this.state.throwCounter;
+            let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
+            fetch(url)
+                .then(resp => resp.json())
+                .then(function (data) {
+                    localStorage.setItem("suggestion", data);
+                })
+                .then(this.setSuggestion());
+        }
     };
 
     //DOM AND BACKEND
@@ -470,7 +475,7 @@ class App extends Component {
 
     setSuggestion() {
         let suggestion = document.getElementById("suggestion");
-        suggestion.innerHTML="<h3>" + localStorage.getItem("suggestion") + "</h3>";
+        suggestion.innerHTML = "<h3>" + localStorage.getItem("suggestion") + "</h3>";
     }
 
     render() {
