@@ -19,16 +19,18 @@ class Input extends Component {
             },
             body: players,
         })
+            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
+            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
             .then(resp => resp.json())
             .then(function (data) {
                 localStorage.setItem("gameId", data);
             })
-            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
-            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
             .then(window.location.hash = "#board")
             .then(this.props.toggleNavbar())
-            .then(this.props.setGameId(localStorage.getItem("gameId")))
-            .then(document.getElementById('p1-nameH1').className = 'highlighted');
+            .finally(() => {
+                this.props.setGameId(localStorage.getItem("gameId"))
+            });
+            // .then(document.getElementById('p1-nameH1').className = 'highlighted');
     };
 
 
