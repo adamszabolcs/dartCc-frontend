@@ -3,10 +3,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 class Input extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     createGame = () => {
         let players = JSON.stringify({
             playerOne: this.props.playerOne.name,
