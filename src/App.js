@@ -109,6 +109,8 @@ class App extends Component {
                     playerTwo: actualPlayer
                 });
                 break;
+            default:
+                break;
         }
         let game = {...this.state.game};
         game.turnScore += score;
@@ -140,8 +142,7 @@ class App extends Component {
     getId = e => {
         // get clicked area's id on the board
         e.preventDefault();
-        let id = e.target.getAttribute('id');
-        return id;
+        return e.target.getAttribute('id');
     };
 
     setHighestTurn = () => {
@@ -262,6 +263,8 @@ class App extends Component {
             case "p2":
                 actualPlayerScore = this.state.game.playerTwoScore;
                 break;
+            default:
+                break;
         }
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
@@ -300,10 +303,7 @@ class App extends Component {
         // checks if player won
         e.preventDefault();
         let id = this.getId(e);
-        if (id[0] === 'd' && actualPlayerScore === 0) {
-            return true;
-        }
-        return false;
+        return (id[0] === 'd' && actualPlayerScore === 0);
     };
 
     win() {
@@ -313,12 +313,14 @@ class App extends Component {
         let winnerPlayer;
         switch (this.state.game.actualPlayer) {
             case 'p1':
-                winnerPlayer = this.state.playerOne.name == "" ?
+                winnerPlayer = this.state.playerOne.name === "" ?
                     localStorage.getItem("playerOne") : this.state.playerOne.name;
                 break;
             case 'p2':
-                winnerPlayer = this.state.playerTwo.name == "" ?
+                winnerPlayer = this.state.playerTwo.name === "" ?
                     localStorage.getItem("playerTwo") : this.state.playerTwo.name;
+                break;
+            default:
                 break;
         }
         winner.innerHTML = `<h3>The winner is ` + winnerPlayer + `!</h3>`;
@@ -386,6 +388,8 @@ class App extends Component {
                         playerTwo: actualPlayer,
                     });
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -436,7 +440,7 @@ class App extends Component {
     callForSuggestion = actualPlayerScore => {
         if (actualPlayerScore <= 170) {
             let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
-            let url = "http://localhost:8080/hint-" + howManyDarts + "&score=" + actualPlayerScore;
+            let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
             fetch(url)
                 .then(resp => resp.json())
                 .then(function (data) {
