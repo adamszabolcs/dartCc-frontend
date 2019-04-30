@@ -313,10 +313,12 @@ class App extends Component {
         let winnerPlayer;
         switch (this.state.game.actualPlayer) {
             case 'p1':
-                winnerPlayer = this.state.playerOne.name;
+                winnerPlayer = this.state.playerOne.name == "" ?
+                    localStorage.getItem("playerOne") : this.state.playerOne.name;
                 break;
             case 'p2':
-                winnerPlayer = this.state.playerTwo.name;
+                winnerPlayer = this.state.playerTwo.name == "" ?
+                    localStorage.getItem("playerTwo") : this.state.playerTwo.name;
                 break;
         }
         winner.innerHTML = `<h3>The winner is ` + winnerPlayer + `!</h3>`;
@@ -434,7 +436,7 @@ class App extends Component {
     callForSuggestion = actualPlayerScore => {
         if (actualPlayerScore <= 170) {
             let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
-            let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
+            let url = "http://localhost:8080/hint-" + howManyDarts + "&score=" + actualPlayerScore;
             fetch(url)
                 .then(resp => resp.json())
                 .then(function (data) {
