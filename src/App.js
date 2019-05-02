@@ -303,7 +303,7 @@ class App extends Component {
         // checks if player won
         e.preventDefault();
         let id = this.getId(e);
-        return (id[0] === 'd' && actualPlayerScore === 0);
+        return ((id[0] === 'd' && actualPlayerScore === 0) || (id === 'Bull' && actualPlayerScore === 0));
     };
 
     win() {
