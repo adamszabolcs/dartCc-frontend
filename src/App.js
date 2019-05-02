@@ -236,13 +236,13 @@ class App extends Component {
             document.getElementById('p2-nameH1').className = 'highlighted';
             document.getElementById('p1-nameH1').classList.remove('highlighted');
             game.actualPlayer = 'p2';
-            this.callForSuggestion(this.state.game.playerTwoScore);
+            this.callForSuggestion(this.state.game.playerTwoScore, game.actualPlayer);
         } else {
             document.getElementById('p1-nameH1').className = 'highlighted';
             document.getElementById('p2-nameH1').classList.remove('highlighted');
             game.round += 1;
             game.actualPlayer = 'p1';
-            this.callForSuggestion(this.state.game.playerOneScore);
+            this.callForSuggestion(this.state.game.playerOneScore, game.actualPlayer);
         }
         this.setState({game});
     };
@@ -270,7 +270,7 @@ class App extends Component {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
             if (this.state.game.throwCounter === 1) {
-                this.callForSuggestion(actualPlayerScore - score);
+                this.callForSuggestion(actualPlayerScore - score, this.state.game.actualPlayer);
             }
             if (actualPlayerScore - score === 0) {
                 if (this.checkWin(e, actualPlayerScore - score)) {
@@ -437,17 +437,24 @@ class App extends Component {
         })
     };
 
-    callForSuggestion = actualPlayerScore => {
+    callForSuggestion = (actualPlayerScore, actualPlayer) => {
         if (actualPlayerScore <= 170) {
             let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
+            let playerSuggestion;
+            switch(actualPlayer) {
+                case "p1":
+                    playerSuggestion = "p1suggestion";
+                    break;
+                case "p2":
+                    playerSuggestion = "p2suggestion";
+                    break;
+            }
             let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
             fetch(url)
-                .then(resp => resp.json())
-                .then(function (data) {
-                    localStorage.setItem("suggestion", data);
-                })
+                .then(resp => resp.text()
+                    .then(data => localStorage.setItem(playerSuggestion, data)))
                 .finally(() => {
-                    this.setSuggestion();
+                    this.setSuggestion(playerSuggestion);
                 });
         }
     };
@@ -486,9 +493,13 @@ class App extends Component {
         }
     };
 
-    setSuggestion() {
+    setSuggestion(playerSuggestion) {
         let suggestion = document.getElementById("suggestion");
-        suggestion.innerHTML = "<h3>" + localStorage.getItem("suggestion") + "</h3>";
+        if (localStorage.getItem(playerSuggestion) !== null ) {
+            suggestion.innerHTML = localStorage.getItem(playerSuggestion);
+        } else {
+            suggestion.innerHTML = "No checkout suggestion";
+        }
     }
 
     render() {
