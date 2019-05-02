@@ -19,9 +19,21 @@ class Table extends Component {
         }
     }
 
+    checkIfPlayerWon() {
+        if (this.props.game.winner) {
+            return (
+                <div style={{textAlign: "right"}}>
+                    <button className="btn playbutton fontchange" onClick={this.props.createNewGame}>
+                        NEW GAME
+                    </button>
+                </div>)
+        }
+    }
+
     render() {
         const playerOneName = this.checkPlayerOne();
         const playerTwoName = this.checkPlayerTwo();
+        const newGameButton = this.checkIfPlayerWon();
         return (
             <div>
                 <div className="col-sm-auto align-items-center justify-content-center scoretable" id="tablescore">
@@ -66,10 +78,11 @@ class Table extends Component {
                         </tbody>
                     </table>
                 </div>
-                <div className="col-sm-auto">
+                <div className="col-sm-auto align-items-center justify-content-center hint">
                     <h4 style={{color: "white"}}>Hint:</h4>
                     <h4 id="suggestion">No suggestion for checkout</h4>
                 </div>
+                {newGameButton}
             </div>
         );
     }
