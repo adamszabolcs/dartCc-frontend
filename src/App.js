@@ -31,7 +31,6 @@ class App extends Component {
                 email: "",
                 gamesPlayed: 0,
                 bestOfThree: 0,
-                wins: 0,
                 turnScore: 0,
                 avgPerDart: 0,
                 avgPerRound: 0,
@@ -41,7 +40,6 @@ class App extends Component {
                 email: "",
                 gamesPlayed: 0,
                 bestOfThree: 0,
-                wins: 0,
                 turnScore: 0,
                 avgPerDart: 0,
                 avgPerRound: 0,
@@ -543,6 +541,7 @@ class App extends Component {
             document.getElementById("sideNav").style.display = "flex";
             $('.scoretable').animate({"width": 0}, 500, 0, function () {
                 document.getElementById('tablescore').className += " hidden";
+                document.getElementById('hint').className +=  " hidden";
             });
         } else {
             $(document.body).animate({"paddingLeft": 0});
@@ -550,9 +549,13 @@ class App extends Component {
                 document.getElementById("sideNav").className += " hidden";
             });
             document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
+            document.getElementById("hint").className = "col-sm-auto align-items-center justify-content-center hint scoretable";
             $('#tablescore').animate({"width": 300}, 1000, 0, function () {
                 $('#tablescore').css("width", "");
             });
+            $('#hint').animate({"width": 300}, 1000, 0, function () {
+                $('#hint').css("width", "");
+            })
         }
     };
 

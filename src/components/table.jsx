@@ -78,7 +78,7 @@ class Table extends Component {
                         </tbody>
                     </table>
                 </div>
-                <div className="col-sm-auto align-items-center justify-content-center hint">
+                <div className="col-sm-auto align-items-center justify-content-center hint scoretable" id="hint">
                     <h4 style={{color: "white"}}>Hint:</h4>
                     <h4 id="suggestion">No suggestion for checkout</h4>
                 </div>
