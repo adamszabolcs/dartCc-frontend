@@ -31,6 +31,7 @@ class DartBoard extends Component {
                     game = {this.props.game}
                     playerOne = {this.props.playerOne}
                     playerTwo = {this.props.playerTwo}
+                    createNewGame = {this.props.createNewGame}
                     />
             )
         }
