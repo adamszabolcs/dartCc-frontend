@@ -13,7 +13,7 @@ class App extends Component {
         this.state = {
             collapsed: true,
             game: {
-                gameId: null,
+                gameId: -1,
                 doubles: 0,
                 triples: 0,
                 round: 1,
@@ -31,7 +31,6 @@ class App extends Component {
                 email: "",
                 gamesPlayed: 0,
                 bestOfThree: 0,
-                wins: 0,
                 turnScore: 0,
                 avgPerDart: 0,
                 avgPerRound: 0,
@@ -41,7 +40,6 @@ class App extends Component {
                 email: "",
                 gamesPlayed: 0,
                 bestOfThree: 0,
-                wins: 0,
                 turnScore: 0,
                 avgPerDart: 0,
                 avgPerRound: 0,
@@ -93,6 +91,25 @@ class App extends Component {
 
     setTurnScore = score => {
         // if throw happened, increment turnScore by score
+        let actualPlayer;
+        switch (this.state.game.actualPlayer) {
+            case 'p1':
+                actualPlayer = {...this.state.playerOne};
+                actualPlayer.turnScore += score;
+                this.setState({
+                    playerOne: actualPlayer
+                });
+                break;
+            case 'p2':
+                actualPlayer = {...this.state.playerTwo};
+                actualPlayer.turnScore += score;
+                this.setState({
+                    playerTwo: actualPlayer
+                });
+                break;
+            default:
+                break;
+        }
         let game = {...this.state.game};
         game.turnScore += score;
         this.setState({game});
@@ -123,8 +140,7 @@ class App extends Component {
     getId = e => {
         // get clicked area's id on the board
         e.preventDefault();
-        let id = e.target.getAttribute('id');
-        return id;
+        return e.target.getAttribute('id');
     };
 
     setHighestTurn = () => {
@@ -157,22 +173,24 @@ class App extends Component {
         this.setState({game});
     };
 
-    setGameId = (gameId) => {
+    setGameId = gameId => {
         // when game created, sets the gameId
         let game = {...this.state.game};
-        game.gameId = gameId;
+        game.gameId = parseInt(gameId);
         this.setState({game});
     };
 
     setOriginalScore() {
         // if turn is valid, sets original score to player remaining score
-        let game = {...this.state.game};
-        if (game.actualPlayer === "p1") {
-            game.playerOneOriginalScore = game.playerOneScore;
-        } else {
-            game.playerTwoOriginalScore = game.playerTwoScore;
+        if (this.state.game.throwCounter === 3) {
+            let game = {...this.state.game};
+            if (game.actualPlayer === "p1") {
+                game.playerOneOriginalScore = game.playerOneScore;
+            } else {
+                game.playerTwoOriginalScore = game.playerTwoScore;
+            }
+            this.setState({game});
         }
-        this.setState({game});
     }
 
     getDartValueFromID = e => {
@@ -210,13 +228,19 @@ class App extends Component {
     };
 
     setActualPlayer() {
-        // if throwCounter is 3 or turn is invalid, changes actual player
+        // if throwCounter is 3 or turn is invalid, changes actual player, call for checkout suggestion
         let game = {...this.state.game};
         if (game.actualPlayer === 'p1') {
+            document.getElementById('p2-nameH1').className = 'highlighted';
+            document.getElementById('p1-nameH1').classList.remove('highlighted');
             game.actualPlayer = 'p2';
+            this.callForSuggestion(this.state.game.playerTwoScore, game.actualPlayer);
         } else {
+            document.getElementById('p1-nameH1').className = 'highlighted';
+            document.getElementById('p2-nameH1').classList.remove('highlighted');
             game.round += 1;
             game.actualPlayer = 'p1';
+            this.callForSuggestion(this.state.game.playerOneScore, game.actualPlayer);
         }
         this.setState({game});
     };
@@ -224,9 +248,11 @@ class App extends Component {
     // GAME RELATED METHODS
 
     registerThrow = (score, e) => {
-        // register throw, checks if throw is valid, if true, sets turn score, sets remaining points, checks if player
-        // wins, if throw is not valid, sets score back, sets highest turn and checks if changing player is necessary
+        // register throw, checks if throw is valid, if true, sets turn score, sets remaining points,
+        // calls for suggestion, checks if player wins, if throw is not valid, sets score back,
+        // sets highest turn and checks if player changing is necessary
         this.incrementThrowCounter();
+        this.revertTurnScoreForPlayers();
         let actualPlayerScore;
         switch (this.state.game.actualPlayer) {
             case "p1":
@@ -235,13 +261,20 @@ class App extends Component {
             case "p2":
                 actualPlayerScore = this.state.game.playerTwoScore;
                 break;
+            default:
+                break;
         }
         if (this.isThrowValid(actualPlayerScore, score)) {
             this.setTurnScore(score);
             this.setPlayerScoreRemaining(score);
-            if (actualPlayerScore === 0) {
-                if (this.checkWin(e, actualPlayerScore)) {
+            if (this.state.game.throwCounter === 1) {
+                this.callForSuggestion(actualPlayerScore - score, this.state.game.actualPlayer);
+            }
+            if (actualPlayerScore - score === 0) {
+                if (this.checkWin(e, actualPlayerScore - score)) {
                     this.win();
+                } else {
+                    this.setScoreBack();
                 }
             }
         } else {
@@ -253,7 +286,7 @@ class App extends Component {
 
     isThrowValid(playerScore, turnScore) {
         // checks if throw is valid
-        return (playerScore - turnScore) >= 2 || (playerScore - turnScore === 0);
+        return (playerScore - turnScore) >= 2 || (playerScore - turnScore) === 0;
     };
 
     countScore = e => {
@@ -268,18 +301,29 @@ class App extends Component {
         // checks if player won
         e.preventDefault();
         let id = this.getId(e);
-        if (this.state.game.actualPlayer === "p1")
-            if (id[0] === 'd' && actualPlayerScore === 0) {
-                return true;
-            }
-        return false;
+        return ((id[0] === 'd' && actualPlayerScore === 0) || (id === 'Bull' && actualPlayerScore === 0));
     };
 
     win() {
         //sets and shows winner, send turn to backend
+        console.log("WIN!!!!");
         let winner = document.getElementById(this.state.game.actualPlayer + "-win");
-        winner.innerHTML = `<h1>WINNER!!!</h1>`;
+        let winnerPlayer;
+        switch (this.state.game.actualPlayer) {
+            case 'p1':
+                winnerPlayer = this.state.playerOne.name === "" ?
+                    localStorage.getItem("playerOne") : this.state.playerOne.name;
+                break;
+            case 'p2':
+                winnerPlayer = this.state.playerTwo.name === "" ?
+                    localStorage.getItem("playerTwo") : this.state.playerTwo.name;
+                break;
+            default:
+                break;
+        }
+
         this.setWinner(this.state.game.actualPlayer);
+        winner.innerHTML = `<h3 style="color: white">The winner is ` + winnerPlayer + `!</h3>`;
         this.sendTurnToBackend();
     };
 
@@ -289,9 +333,11 @@ class App extends Component {
         if (this.state.game.throwCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
             this.setOriginalScore();
             this.calculateAndSetAverage();
-            this.sendTurnToBackend();
-            this.setActualPlayer();
+            if (this.state.game.winner === null) {
+                this.sendTurnToBackend();
+            }
             this.revertTurnStats();
+            this.setActualPlayer();
         }
     };
 
@@ -301,30 +347,103 @@ class App extends Component {
         if (this.state.game.actualPlayer === 'p1') {
             player = {...this.state.playerOne};
             player.avgPerDart = (((301 - this.state.game.playerOneScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerOne:player});
+            player.avgPerRound = (player.avgPerDart * 3).toFixed(1);
+            this.setState({playerOne: player});
         } else {
             player = {...this.state.playerTwo};
             player.avgPerDart = (((301 - this.state.game.playerTwoScore) / this.state.game.round) / 3).toFixed(1);
-            player.avgPerRound = (player.avgPerDart*3).toFixed(1);
-            this.setState({playerTwo:player});
+            player.avgPerRound = (player.avgPerDart * 3).toFixed(1);
+            this.setState({playerTwo: player});
         }
     };
 
     revertTurnStats() {
         // after a turn, sets back the turnscore and throwcounter to zero
         let game = {...this.state.game};
+        let playerOne = {...this.state.playerOne};
+        let playerTwo = {...this.state.playerTwo};
+
         game.turnScore = 0;
         game.throwCounter = 0;
+        playerOne.turnScore = 0;
+        playerTwo.turnScore = 0;
+
         this.setState({game});
+    };
+
+    revertTurnScoreForPlayers() {
+        if (this.state.game.throwCounter === 1) {
+            let actualPlayer;
+            switch (this.state.game.actualPlayer) {
+                case 'p1':
+                    actualPlayer = {...this.state.playerOne};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerOne: actualPlayer,
+                    });
+                    break;
+                case 'p2':
+                    actualPlayer = {...this.state.playerTwo};
+                    actualPlayer.turnScore = 0;
+                    this.setState({
+                        playerTwo: actualPlayer,
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    createNewGame = () => {
+        this.getNewIdFromBackend();
+        this.setStateBack();
+    };
+
+    setStateBack = () => {
+        this.revertWinnerDiv();
+        let game = {...this.state.game};
+        let playerOne = {...this.state.playerOne};
+        let playerTwo = {...this.state.playerTwo};
+        game.doubles = 0;
+        game.triples = 0;
+        game.round = 1;
+        game.playerOneOriginalScore = 301;
+        game.playerTwoOriginalScore = 301;
+        game.playerOneScore = 301;
+        game.playerTwoScore = 301;
+        game.throwCounter = 0;
+        game.actualPlayer = "p1";
+        game.winner = null;
+        game.turnScore = 0;
+        playerOne.bestOfThree = 0;
+        playerOne.turnScore = 0;
+        playerOne.avgPerDart = 0;
+        playerOne.avgPerRound = 0;
+        playerTwo.bestOfThree = 0;
+        playerTwo.turnScore = 0;
+        playerTwo.avgPerDart = 0;
+        playerTwo.avgPerRound = 0;
+        this.setState({
+            game,
+            playerOne,
+            playerTwo
+        });
+        this.setSuggestion("p1");
     };
 
     //COMMUNICATION WITH BACKEND
 
     sendTurnToBackend = () => {
         //after turn, sends the necessary information to the backend
+        let gameId = this.state.game.gameId === -1 ? localStorage.getItem("gameId") : this.state.game.gameId;
+        let playerOneName = this.state.playerOne.name === "" ?
+            localStorage.getItem("playerOne") : this.state.playerOne.name;
+        let playerTwoName = this.state.playerTwo.name === "" ?
+            localStorage.getItem("playerTwo") : this.state.playerTwo.name;
         let body = JSON.stringify({
             game: {
+                id: gameId,
                 doubles: this.state.game.doubles,
                 triples: this.state.game.triples,
                 round: this.state.game.round,
@@ -333,14 +452,14 @@ class App extends Component {
                 winner: this.state.game.winner
             },
             playerOne: {
-                name: this.state.playerOne.name,
+                name: playerOneName,
                 wins: this.state.playerOne.wins,
                 bestOfThree: this.state.playerOne.bestOfThree,
                 avgPerDart: this.state.playerOne.avgPerDart,
                 avgPerRound: this.state.playerOne.avgPerRound
             },
             playerTwo: {
-                name: this.state.playerTwo.name,
+                name: playerTwoName,
                 wins: this.state.playerTwo.wins,
                 bestOfThree: this.state.playerTwo.bestOfThree,
                 avgPerDart: this.state.playerTwo.avgPerDart,
@@ -355,6 +474,53 @@ class App extends Component {
             body: body
         })
     };
+
+    callForSuggestion = (actualPlayerScore, actualPlayer) => {
+        if (actualPlayerScore <= 170) {
+            let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
+            let playerSuggestion;
+            switch (actualPlayer) {
+                case "p1":
+                    playerSuggestion = "p1suggestion";
+                    break;
+                case "p2":
+                    playerSuggestion = "p2suggestion";
+                    break;
+            }
+            let url = "http://localhost:8080/hint-" + howManyDarts + "/" + actualPlayerScore;
+            fetch(url)
+                .then(resp => resp.text()
+                    .then(data => localStorage.setItem(playerSuggestion, data)))
+                .finally(() => {
+                    this.setSuggestion(playerSuggestion);
+                });
+        }
+    };
+
+    getNewIdFromBackend = () => {
+        let players = JSON.stringify({
+            playerOne: localStorage.getItem("playerOne"),
+            playerTwo: localStorage.getItem("playerTwo")
+        });
+        fetch("http://localhost:8080/create-game", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: players,
+        })
+            .then(resp => resp.json())
+            .then(function (data) {
+                localStorage.setItem("gameId", data);
+            })
+            .finally(() => {
+                this.setGameId(localStorage.getItem("gameId"))
+            });
+        localStorage.removeItem("p1suggestion");
+        localStorage.removeItem("p2suggestion");
+    };
+
+    //DOM
 
     toggleNavbar() {
         // after game created, hides the navbar
@@ -375,6 +541,7 @@ class App extends Component {
             document.getElementById("sideNav").style.display = "flex";
             $('.scoretable').animate({"width": 0}, 500, 0, function () {
                 document.getElementById('tablescore').className += " hidden";
+                document.getElementById('hint').className +=  " hidden";
             });
         } else {
             $(document.body).animate({"paddingLeft": 0});
@@ -382,10 +549,30 @@ class App extends Component {
                 document.getElementById("sideNav").className += " hidden";
             });
             document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
+            document.getElementById("hint").className = "col-sm-auto align-items-center justify-content-center hint scoretable";
             $('#tablescore').animate({"width": 300}, 1000, 0, function () {
                 $('#tablescore').css("width", "");
             });
+            $('#hint').animate({"width": 300}, 1000, 0, function () {
+                $('#hint').css("width", "");
+            })
         }
+    };
+
+    setSuggestion(playerSuggestion) {
+        let suggestion = document.getElementById("suggestion");
+        if (localStorage.getItem(playerSuggestion) !== null) {
+            suggestion.innerHTML = localStorage.getItem(playerSuggestion);
+        } else {
+            suggestion.innerHTML = "No checkout suggestion";
+        }
+    }
+
+    revertWinnerDiv = () => {
+        let winnerOne = document.getElementById("p1-win");
+        let winnerTwo = document.getElementById("p2-win");
+        winnerOne.innerHTML = "<h3></h3>";
+        winnerTwo.innerHTML = "<h3></h3>";
     };
 
     render() {
@@ -395,7 +582,7 @@ class App extends Component {
                 <Input
                     playerOne={this.state.playerOne}
                     playerTwo={this.state.playerTwo}
-                    getPlayerName={this.setPlayersName}
+                    setPlayersName={this.setPlayersName}
                     toggleNavbar={this.toggleNavbar}
                     setGameId={this.setGameId}
                 />
@@ -405,6 +592,7 @@ class App extends Component {
                     game={this.state.game}
                     toggleNavbarBack={this.toggleNavbarBack}
                     countScore={this.countScore}
+                    createNewGame={this.createNewGame}
                 />
                 <Hint/>
             </div>

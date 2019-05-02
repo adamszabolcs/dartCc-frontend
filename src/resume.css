@@ -220,3 +220,19 @@ li a:hover, a:focus, a.current {
   background-color: #fac20c;
   color: #212529 !important;
 }
+
+.highlighted {
+  color: rgb(79, 153, 98);
+}
+
+#suggestion {
+    color: white;
+}
+
+.scoretable {
+    overflow: hidden;
+}
+
+.hint {
+    text-align: right;
+}

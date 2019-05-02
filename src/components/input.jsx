@@ -3,10 +3,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 class Input extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     createGame = () => {
         let players = JSON.stringify({
             playerOne: this.props.playerOne.name,
@@ -19,15 +15,18 @@ class Input extends Component {
             },
             body: players,
         })
+            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
+            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
             .then(resp => resp.json())
             .then(function (data) {
                 localStorage.setItem("gameId", data);
             })
-            .then(localStorage.setItem("playerOne", this.props.playerOne.name))
-            .then(localStorage.setItem("playerTwo", this.props.playerTwo.name))
             .then(window.location.hash = "#board")
             .then(this.props.toggleNavbar())
-            .then(this.props.setGameId(localStorage.getItem("gameId")));
+            .finally(() => {
+                this.props.setGameId(localStorage.getItem("gameId"))
+            });
+            // .then(document.getElementById('p1-nameH1').className = 'highlighted');
     };
 
 
@@ -41,12 +40,14 @@ class Input extends Component {
                         <input className="form-control"
                                type="text" name="p1name" value={this.props.playerOne.name}
                                placeholder="Player 1 name"
-                               onChange={this.props.setPlayersName}/>
+                               onChange={this.props.setPlayersName}
+                               />
                         <br/>
                         <input className="form-control"
                                type="text" name="p2name" value={this.props.playerTwo.name}
                                placeholder="Player 2 name"
-                               onChange={this.props.setPlayersName}/>
+                               onChange={this.props.setPlayersName}
+                               />
                         <br/>
                         <a className="btn playbutton fontchange" onClick={this.createGame}> LET'S PLAY!</a>
                     </form>
