@@ -323,8 +323,9 @@ class App extends Component {
             default:
                 break;
         }
-        winner.innerHTML = `<h3 style="color: white">The winner is ` + winnerPlayer + `!</h3>`;
+
         this.setWinner(this.state.game.actualPlayer);
+        winner.innerHTML = `<h3 style="color: white">The winner is ` + winnerPlayer + `!</h3>`;
         this.sendTurnToBackend();
     };
 
@@ -334,7 +335,9 @@ class App extends Component {
         if (this.state.game.throwCounter === 3 || !this.isThrowValid(actualPlayerScore, score)) {
             this.setOriginalScore();
             this.calculateAndSetAverage();
-            this.sendTurnToBackend();
+            if (this.state.game.winner === null) {
+                this.sendTurnToBackend();
+            }
             this.revertTurnStats();
             this.setActualPlayer();
         }
@@ -394,6 +397,43 @@ class App extends Component {
         }
     }
 
+    createNewGame = () => {
+        this.getNewIdFromBackend();
+        this.setStateBack();
+    };
+
+    setStateBack = () => {
+        this.revertWinnerDiv();
+        let game = {...this.state.game};
+        let playerOne = {...this.state.playerOne};
+        let playerTwo = {...this.state.playerTwo};
+        game.doubles = 0;
+        game.triples = 0;
+        game.round = 1;
+        game.playerOneOriginalScore = 301;
+        game.playerTwoOriginalScore = 301;
+        game.playerOneScore = 301;
+        game.playerTwoScore = 301;
+        game.throwCounter = 0;
+        game.actualPlayer = "p1";
+        game.winner = null;
+        game.turnScore = 0;
+        playerOne.bestOfThree = 0;
+        playerOne.turnScore = 0;
+        playerOne.avgPerDart = 0;
+        playerOne.avgPerRound = 0;
+        playerTwo.bestOfThree = 0;
+        playerTwo.turnScore = 0;
+        playerTwo.avgPerDart = 0;
+        playerTwo.avgPerRound = 0;
+        this.setState({
+            game,
+            playerOne,
+            playerTwo
+        });
+        this.setSuggestion("p1");
+    };
+
     //COMMUNICATION WITH BACKEND
 
     sendTurnToBackend = () => {
@@ -441,7 +481,7 @@ class App extends Component {
         if (actualPlayerScore <= 170) {
             let howManyDarts = 3 - parseInt(this.state.game.throwCounter);
             let playerSuggestion;
-            switch(actualPlayer) {
+            switch (actualPlayer) {
                 case "p1":
                     playerSuggestion = "p1suggestion";
                     break;
@@ -459,7 +499,30 @@ class App extends Component {
         }
     };
 
-    //DOM AND BACKEND
+    getNewIdFromBackend = () => {
+        let players = JSON.stringify({
+            playerOne: localStorage.getItem("playerOne"),
+            playerTwo: localStorage.getItem("playerTwo")
+        });
+        fetch("http://localhost:8080/create-game", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: players,
+        })
+            .then(resp => resp.json())
+            .then(function (data) {
+                localStorage.setItem("gameId", data);
+            })
+            .finally(() => {
+                this.setGameId(localStorage.getItem("gameId"))
+            });
+        localStorage.removeItem("p1suggestion");
+        localStorage.removeItem("p2suggestion");
+    };
+
+    //DOM
 
     toggleNavbar() {
         // after game created, hides the navbar
@@ -495,12 +558,19 @@ class App extends Component {
 
     setSuggestion(playerSuggestion) {
         let suggestion = document.getElementById("suggestion");
-        if (localStorage.getItem(playerSuggestion) !== null ) {
+        if (localStorage.getItem(playerSuggestion) !== null) {
             suggestion.innerHTML = localStorage.getItem(playerSuggestion);
         } else {
             suggestion.innerHTML = "No checkout suggestion";
         }
     }
+
+    revertWinnerDiv = () => {
+        let winnerOne = document.getElementById("p1-win");
+        let winnerTwo = document.getElementById("p2-win");
+        winnerOne.innerHTML = "<h3></h3>";
+        winnerTwo.innerHTML = "<h3></h3>";
+    };
 
     render() {
         return (
@@ -519,12 +589,12 @@ class App extends Component {
                     game={this.state.game}
                     toggleNavbarBack={this.toggleNavbarBack}
                     countScore={this.countScore}
+                    createNewGame={this.createNewGame}
                 />
                 <Hint/>
             </div>
         );
     }
-
 }
 
 export default App;
