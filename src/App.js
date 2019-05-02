@@ -323,7 +323,7 @@ class App extends Component {
             default:
                 break;
         }
-        winner.innerHTML = `<h3>The winner is ` + winnerPlayer + `!</h3>`;
+        winner.innerHTML = `<h3 style="color: white">The winner is ` + winnerPlayer + `!</h3>`;
         this.setWinner(this.state.game.actualPlayer);
         this.sendTurnToBackend();
     };
