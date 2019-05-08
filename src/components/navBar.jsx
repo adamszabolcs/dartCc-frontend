@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../resume.css'
+import '../index.css'
 import whitedart from '../whitedart.png';
 import $ from 'jquery';
 import 'bootstrap/js/src/collapse';

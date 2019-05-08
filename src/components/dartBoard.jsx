@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../resume.css';
+import '../index.css';
 import '../board.css';
 import hamburger from '../hmenu.png';
 import Table from './table';
