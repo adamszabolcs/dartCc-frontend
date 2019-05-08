@@ -18,7 +18,7 @@ class DartBoard extends Component {
         if (localStorage.getItem("gameId")) {
             return (
                 <img src={hamburger} alt="Open menu"
-                     onClick={this.props.toggleNavbarBack}
+                     onClick={this.props.toggleNavBar}
                      style={{cursor: "pointer"}}/>
             )
         }
