@@ -87,9 +87,6 @@ class NavBar extends Component {
                             <a className="nav-link js-scroll-trigger" href="#help">About the game</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link js-scroll-trigger" href="#register">Register/Login</a>
-                        </li>
-                        <li className="nav-item">
                             <a className="nav-link js-scroll-trigger" href="#profile">Profile</a>
                         </li>
                         <li className="nav-item">
