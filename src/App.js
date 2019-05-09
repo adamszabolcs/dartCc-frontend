@@ -598,11 +598,8 @@ class App extends Component {
         this.setState({
             collapsed: !this.state.collapsed,
         });
-        if (this.state.collapsed) {
-            this.collapseTable();
-        } else {
-            this.collapseNavBar();
-        }
+
+        this.state.collapsed === true ? this.collapseTable() : this.collapseNavBar();
 
     };
 
