@@ -4,7 +4,6 @@ import DartBoard from './components/dartBoard';
 import NavBar from './components/navBar';
 import Hint from './components/hint';
 import Input from './components/input';
-import $ from 'jquery';
 
 class App extends Component {
 
@@ -522,41 +521,89 @@ class App extends Component {
 
     //DOM
 
-    toggleNavbar() {
+    hideNavBar() {
         // after game created, hides the navbar
-        $(document.body).animate({"paddingLeft": 0});
-        $('#sideNav').animate({"width": 0});
-        document.getElementById("sideNav").className += " hidden";
-    }
+        let leftPadding = 17;
 
-    toggleNavbarBack = () => {
+        function frame() {
+            leftPadding--;
+            document.body.style.paddingLeft = leftPadding + 'rem';
+            if (leftPadding === 0) {
+                clearInterval(id);
+            }
+        }
+
+        let id = setInterval(frame, 20);
+        document.getElementById("sideNav").className += " hidden";
+    };
+
+    collapseTable = () => {
+        let paddingLeft = 0;
+        let navBarWidth = 0;
+        let tableWidth = 306;
+
+        document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
+        document.getElementById("hint").className += " hidden";
+
+        function toggle() {
+            paddingLeft++;
+            navBarWidth += 16;
+            tableWidth -= 18;
+
+            document.body.style.paddingLeft = paddingLeft + 'rem';
+            document.getElementById("sideNav").style.width = navBarWidth + 'px';
+            document.getElementById("tablescore").style.width = tableWidth + 'px';
+
+            if (paddingLeft === 17) {
+                document.getElementById("sideNav").style.display = "flex";
+                document.getElementById("tablescore").className += " hidden";
+                clearInterval(id);
+            }
+        }
+
+        let id = setInterval(toggle, 20);
+    };
+
+    collapseNavBar = () => {
+        let paddingLeft = 17;
+        let navBarWidth = 272;
+        let tableAndHintWidth = 0;
+
+        document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
+
+        function toggle() {
+
+            paddingLeft--;
+            navBarWidth -= 16;
+            tableAndHintWidth += 18;
+            document.body.style.paddingLeft = paddingLeft + 'rem';
+
+            document.getElementById("sideNav").style.width = navBarWidth + 'px';
+            document.getElementById("tablescore").style.width = tableAndHintWidth + 'px';
+            document.getElementById("hint").style.width = tableAndHintWidth + 'px';
+
+            if (paddingLeft === 0) {
+                document.getElementById("sideNav").className += " hidden";
+                document.getElementById("hint").className = "col-sm-auto align-items-center justify-content-center hint scoretable";
+                clearInterval(id);
+            }
+        }
+
+        let id = setInterval(toggle, 20);
+
+    };
+
+    toggleNavBar = () => {
         // if hamburger icon clicked, either table collapses and menu shown or menu collapses and table shown
         this.setState({
             collapsed: !this.state.collapsed,
         });
         if (this.state.collapsed) {
-            $(document.body).animate({"paddingLeft": "17rem"});
-            $('#sideNav').animate({"width": 272}, 500);
-            document.getElementById("sideNav").className = "navbar navbar-expand-lg navbar-dark bg-primary fixed-top";
-            document.getElementById("sideNav").style.display = "flex";
-            $('.scoretable').animate({"width": 0}, 500, 0, function () {
-                document.getElementById('tablescore').className += " hidden";
-                document.getElementById('hint').className +=  " hidden";
-            });
+            this.collapseTable();
         } else {
-            $(document.body).animate({"paddingLeft": 0});
-            $('#sideNav').animate({"width": 0}, 500, 0, function () {
-                document.getElementById("sideNav").className += " hidden";
-            });
-            document.getElementById("tablescore").className = "col-sm-auto align-items-center justify-content-center scoretable";
-            document.getElementById("hint").className = "col-sm-auto align-items-center justify-content-center hint scoretable";
-            $('#tablescore').animate({"width": 300}, 1000, 0, function () {
-                $('#tablescore').css("width", "");
-            });
-            $('#hint').animate({"width": 300}, 1000, 0, function () {
-                $('#hint').css("width", "");
-            })
+            this.collapseNavBar();
         }
+
     };
 
     setSuggestion(playerSuggestion) {
@@ -566,7 +613,7 @@ class App extends Component {
         } else {
             suggestion.innerHTML = "No checkout suggestion";
         }
-    }
+    };
 
     revertWinnerDiv = () => {
         let winnerOne = document.getElementById("p1-win");
@@ -583,14 +630,14 @@ class App extends Component {
                     playerOne={this.state.playerOne}
                     playerTwo={this.state.playerTwo}
                     setPlayersName={this.setPlayersName}
-                    toggleNavbar={this.toggleNavbar}
+                    hideNavBar={this.hideNavBar}
                     setGameId={this.setGameId}
                 />
                 <DartBoard
                     playerOne={this.state.playerOne}
                     playerTwo={this.state.playerTwo}
                     game={this.state.game}
-                    toggleNavbarBack={this.toggleNavbarBack}
+                    toggleNavBar={this.toggleNavBar}
                     countScore={this.countScore}
                     createNewGame={this.createNewGame}
                 />

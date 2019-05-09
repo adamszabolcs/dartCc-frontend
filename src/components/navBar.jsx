@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../resume.css'
+import '../index.css'
 import whitedart from '../whitedart.png';
-import $ from 'jquery';
 import 'bootstrap/js/src/collapse';
 
 
@@ -26,21 +25,22 @@ class NavBar extends Component {
             })
         }
 
-        $(window).scroll(function () {
-            var scrollDistance = $(window).scrollTop();
+        window.onscroll = function() {
+            let scrollDistance = window.pageYOffset;
+            let sections = document.getElementsByClassName("resume-section");
 
-            // Assign active class to nav links while scolling
-            $('.resume-section').each(function (i) {
-                if ($(this).position().top <= scrollDistance) {
-                    $('.nav-item a.isactive').removeClass('isactive');
-                    $('.nav-item a').eq(i).addClass('isactive');
+            for (let i = 0; i < sections.length; i++) {
+                let section = sections[i];
+                if (section.offsetTop <= scrollDistance) {
+                    document.querySelector(".nav-item a.isactive").classList.remove("isactive");
+                    document.querySelectorAll(".nav-item a")[i].classList.add("isactive");
                 }
-            });
-        }).scroll();
+            }
+        }
 
     };
 
-    toggleNavbar = () => {
+    toggleNavBar = () => {
         this.setState({
             collapsed: !this.state.collapsed,
         });
@@ -69,7 +69,7 @@ class NavBar extends Component {
                              alt=""/>
                     </span>
                 </a>
-                <button onClick={this.toggleNavbar} className={`${classTwo}`} type="button" data-toggle="collapse"
+                <button onClick={this.toggleNavBar} className={`${classTwo}`} type="button" data-toggle="collapse"
                         data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
@@ -85,9 +85,6 @@ class NavBar extends Component {
                         </li>
                         <li className="nav-item">
                             <a className="nav-link js-scroll-trigger" href="#help">About the game</a>
-                        </li>
-                        <li className="nav-item">
-                            <a className="nav-link js-scroll-trigger" href="#register">Register/Login</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link js-scroll-trigger" href="#profile">Profile</a>

@@ -22,11 +22,10 @@ class Input extends Component {
                 localStorage.setItem("gameId", data);
             })
             .then(window.location.hash = "#board")
-            .then(this.props.toggleNavbar())
+            .then(this.props.hideNavBar())
             .finally(() => {
                 this.props.setGameId(localStorage.getItem("gameId"))
             });
-            // .then(document.getElementById('p1-nameH1').className = 'highlighted');
     };
 
 
